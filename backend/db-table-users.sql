@@ -26,7 +26,8 @@ UPDATE users
 SET email      = 'newEmail@gmail.com',
     first_name = 'John',
     last_name  = 'Doe',
-    passwd     = 'myPassword';
+    passwd     = 'myPassword'
+WHERE user_id = 1;
 
 /*
  To delete a specific user and cascade on the rest of their information
