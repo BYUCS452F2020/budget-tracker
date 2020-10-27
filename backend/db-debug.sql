@@ -12,8 +12,8 @@ INSERT INTO categories (category_id, user_id, category_name, amount, monthly_def
 VALUES (1, 1, 'Rent', 800.00, 600.00);
 INSERT INTO categories (category_id, user_id, category_name, amount, monthly_default)
 VALUES (2, 1, 'Groceries', 400.00, null);
-INSERT INTO expenses (category_id, amount, expense_date, summary)
-VALUES (1, 750.09, '12/12/2020', 'Paid December Rent');
+INSERT INTO expenses (expense_id, category_id, amount, expense_date, summary)
+VALUES (7, 1, 750.09, '12/12/2020', 'Paid December Rent');
 INSERT INTO expenses (category_id, amount, expense_date, summary)
 VALUES (2, 80.09, '01/28/2020', 'Weekly shopping trip');
 INSERT INTO expenses (category_id, amount, expense_date, summary)
