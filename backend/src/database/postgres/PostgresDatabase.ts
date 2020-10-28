@@ -1,4 +1,4 @@
-import { Pool, PoolClient, types } from 'pg';
+import { Pool, PoolClient, QueryConfig, types } from 'pg';
 import { BaseCategory, Category } from '../../models/category';
 import { BaseExpense, Expense } from '../../models/expense';
 import { BaseIncome, Income } from '../../models/income';
@@ -27,6 +27,7 @@ export class PgDatabase implements Database {
   ): Promise<T> {
     const client = await PgDatabase.pool.connect();
     await client.query('BEGIN');
+
     const transactionResult = action(
       client,
       async () => {
@@ -36,14 +37,15 @@ export class PgDatabase implements Database {
         await client.query('ROLLBACK');
       },
     );
+
     client.release();
     return transactionResult;
   }
 
   loginUser(email: string, password: string): Promise<User> {
-    return this.transaction<User>(async (client, commit, rollback) => {
+    const user = this.transaction<User>(async (client, commit, rollback) => {
       try {
-        const queryResults = await client.query<User>({
+        const query: QueryConfig = {
           text: `
             SELECT 
               users.user_id,
@@ -54,7 +56,8 @@ export class PgDatabase implements Database {
             WHERE users.email = $1
               AND users.passwd = $2;`,
           values: [email, password],
-        });
+        };
+        const queryResults = await client.query<User>(query);
         const users = queryResults.rows;
         if (users.length !== 1) {
           throw new Error("Credentials don't match");
@@ -66,17 +69,20 @@ export class PgDatabase implements Database {
         throw error;
       }
     });
+    return user;
   }
+
   getUser(userId: number): Promise<User> {
     return this.transaction<User>(async (client, commit, rollback) => {
       try {
-        const queryResults = await client.query<User>({
+        const query = {
           text: `
             SELECT *
             FROM users
             WHERE user_id = $1;`,
           values: [userId],
-        });
+        };
+        const queryResults = await client.query<User>(query);
         const users = queryResults.rows;
         if (users.length !== 1) {
           throw new Error(`User id ${userId} doesn't exist`);
@@ -100,17 +106,19 @@ export class PgDatabase implements Database {
   getExpenses(userId: number): Promise<Expense[]> {
     return this.transaction<Expense[]>(async (client, commit, rollback) => {
       try {
-        const queryResults = await client.query<Expense>({
+        const query = {
           text: `
             SELECT 
               expenses.summary, 
               round(expenses.amount::numeric, 2) AS amount_spent, 
-              expenses.expense_date, categories.category_name, 
+              expenses.expense_date, 
+              categories.category_name, 
               round(categories.amount::numeric, 2) AS total_category_amount 
             FROM expenses JOIN categories ON expenses.category_id = categories.category_id 
             WHERE categories.user_id = $1;`,
           values: [userId],
-        });
+        };
+        const queryResults = await client.query<Expense>(query);
         const expenses = queryResults.rows;
         commit();
         return expenses;
@@ -120,9 +128,11 @@ export class PgDatabase implements Database {
       }
     });
   }
+
   getIncomes(userId: number): Promise<Income[]> {
     throw new Error('Method not implemented.');
   }
+
   addUser(newUser: BaseUser): Promise<User> {
     const { email, first_name, last_name, passwd } = newUser;
     return this.transaction<User>(async (client, commit, rollback) => {
