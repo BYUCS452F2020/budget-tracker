@@ -1,5 +1,7 @@
-import express from 'express';
+import express, { Request } from 'express';
+import { ParamsDictionary } from '..';
 import { DatabaseFactory } from '../database/database-factory';
+import { Category, CreateCategoryPayload } from '../models/category';
 
 /**
  * A router for all paths beginning with /users/:userId/categories
@@ -7,16 +9,19 @@ import { DatabaseFactory } from '../database/database-factory';
 const categoryRouter = express.Router({ mergeParams: true });
 const db = DatabaseFactory.getDatabase();
 
-categoryRouter.post('/', async (req, res) => {
+categoryRouter.post('/', async (req: Request<ParamsDictionary, Category, CreateCategoryPayload>, res) => {
   try {
-    const category = await db.addCategory(req.body);
+    const category = await db.addCategory({
+      ...req.body,
+      user_id: parseInt(req.params.userId),
+    });
     res.send(category);
   } catch (error) {
     res.send(error.message).status(500);
   }
 });
 
-categoryRouter.get('/', async (req, res) => {
+categoryRouter.get('/', async (req: Request<ParamsDictionary, Category[]>, res) => {
   const userId = parseInt(req.params.userId);
   try {
     const categories = await db.getCategories(userId);
@@ -26,7 +31,7 @@ categoryRouter.get('/', async (req, res) => {
   }
 });
 
-categoryRouter.get('/:categoryId', async (req, res) => {
+categoryRouter.get('/:categoryId', async (req: Request<ParamsDictionary, Category>, res) => {
   const categoryId = parseInt(req.params.categoryId);
   try {
     const category = await db.getCategory(categoryId);
@@ -36,12 +41,10 @@ categoryRouter.get('/:categoryId', async (req, res) => {
   }
 });
 
-categoryRouter.put('/:categoryId', async (req, res) => {
+categoryRouter.put('/:categoryId', async (req: Request<ParamsDictionary, Category, Category>, res) => {
   try {
     const category = await db.editCategory({
       ...req.body,
-      user_id: parseInt(req.params.userId),
-      category_id: parseInt(req.params.categoryId),
     });
     res.send(category);
   } catch (error) {
@@ -49,7 +52,7 @@ categoryRouter.put('/:categoryId', async (req, res) => {
   }
 });
 
-categoryRouter.delete('/:categoryId', async (req, res) => {
+categoryRouter.delete('/:categoryId', async (req: Request<ParamsDictionary>, res) => {
   const categoryId = parseInt(req.params.categoryId);
   try {
     await db.deleteIncome(categoryId);
