@@ -313,7 +313,31 @@ export class PgDatabase implements Database {
     }
 
     editCategory(category: Category): Promise<Category> {
-        throw new Error('Method not implemented.');
+        const {category_id, category_name, amount, monthly_default} = category;
+        return this.transaction<Category>(async (client, commit, rollback) => {
+            try {
+                const queryResult = await client.query<Category>({
+                    text: `
+                        UPDATE categories
+                        SET category_name   = $1,
+                            amount          = $2,
+                            monthly_default = $3
+                        WHERE category_id = $4
+                        RETURNING *;`,
+                    values: [category_name, amount, monthly_default, category_id],
+                });
+                const categories = queryResult.rows;
+                if (categories.length !== 1) {
+                    throw new Error(`Category ID ${category_id} could not be updated`);
+                }
+                const updatedCategory = queryResult.rows[0];
+                await commit();
+                return updatedCategory;
+            } catch (error) {
+                await rollback();
+                throw error;
+            }
+        });
     }
 
     deleteCategory(categoryId: number): Promise<void> {
@@ -342,7 +366,32 @@ export class PgDatabase implements Database {
     }
 
     editExpense(expense: Expense): Promise<Expense> {
-        throw new Error('Method not implemented.');
+        const {category_id, amount, expense_date, summary, expense_id} = expense;
+        return this.transaction<Expense>(async (client, commit, rollback) => {
+            try {
+                const queryResult = await client.query<Expense>({
+                    text: `
+                        UPDATE expenses
+                        SET category_id  = $1,
+                            amount       = $2,
+                            expense_date = $3,
+                            summary      = $4
+                        WHERE expense_id = $5
+                        RETURNING *;`,
+                    values: [category_id, amount, expense_date, summary, expense_id],
+                });
+                const expenses = queryResult.rows;
+                if (expenses.length !== 1) {
+                    throw new Error(`Expense ${expense_id} could not be updated`);
+                }
+                const updatedExpense = queryResult.rows[0];
+                await commit();
+                return updatedExpense;
+            } catch (error) {
+                await rollback();
+                throw error;
+            }
+        });
     }
 
     deleteExpense(expenseId: number): Promise<void> {

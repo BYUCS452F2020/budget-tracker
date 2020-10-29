@@ -34,8 +34,7 @@ UPDATE categories
 SET category_name   = 'I renamed this category',
     amount          = 50,
     monthly_default = 60
-WHERE user_id = 1
-  AND category_id = 2;
+WHERE category_id = 2;
 
 /*
  To delete a specific category and cascade on its expenses.
