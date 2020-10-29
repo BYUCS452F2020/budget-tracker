@@ -134,7 +134,27 @@ export class PgDatabase implements Database {
   }
 
   getIncomes(userId: number): Promise<Income[]> {
-    throw new Error('Method not implemented.');
+    return this.transaction<Income[]>(async (client, commit, rollback) => {
+      try {
+        const query = {
+          text: `
+            SELECT *
+            FROM incomes
+            WHERE user_id = $1;`,
+          values: [userId],
+        };
+        const queryResults = await client.query<Income>(query);
+        const incomes = queryResults.rows;
+        if (incomes.length !== 1) {
+          throw new Error(`User id ${userId} doesn't exist`);
+        }
+        commit();
+        return incomes[0];
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+    });
   }
 
   addUser(newUser: BaseUser): Promise<User> {
@@ -227,13 +247,76 @@ export class PgDatabase implements Database {
   deleteExpense(expenseId: number): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
   addIncome(newIncome: BaseIncome): Promise<Income> {
-    throw new Error('Method not implemented.');
+    const { amount, income_date, summary } = newIncome;
+    return this.transaction<Income>(async (client, commit, rollback) => {
+      try {
+        const queryResult = await client.query<Income>({
+          text: `
+            INSERT INTO incomes (amount, income_date, summary)
+            VALUES ($1, $2, $3);
+            RETURNING *;`,
+          values: [amount, income_date, summary],
+        });
+        const createdIncome = queryResult.rows[0];
+        await commit();
+        return createdIncome;
+      } catch (error) {
+        await rollback();
+        throw error;
+      }
+    });
   }
+
   editIncome(income: Income): Promise<Income> {
-    throw new Error('Method not implemented.');
+    const { income_id, user_id, amount, income_date, summary } = income;
+    return this.transaction<Income>(async (client, commit, rollback) => {
+      try {
+        const queryResult = await client.query<Income>({
+          text: `
+            UPDATE incomes
+            SET 
+              amount = $1,
+              income_date = $2,
+              summary = $3
+            WHERE 
+              income_id = $4
+            RETURNING *;`,
+          values: [amount, income_date, summary, income_id],
+        });
+        const incomes = queryResult.rows;
+        if (incomes.length !== 1) {
+          throw new Error(`Income ${income_id} could not be updated`);
+        }
+        const updatedIncome = queryResult.rows[0];
+        await commit();
+        return updatedIncome;
+      } catch (error) {
+        await rollback();
+        throw error;
+      }
+    });
   }
+
   deleteIncome(incomeId: number): Promise<void> {
-    throw new Error('Method not implemented.');
+    return this.transaction<void>(async (client, commit, rollback) => {
+      try {
+        const queryResult = await client.query({
+          text: `
+            DELETE
+            FROM incomes
+            WHERE income_id = $1;`,
+          values: [incomeId],
+        });
+        if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+          throw new Error(`Income ${incomeId} could not be deleted`);
+        }
+        commit();
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+    });
   }
 }
