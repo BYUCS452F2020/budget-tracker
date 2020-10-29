@@ -1,9 +1,9 @@
-import {Pool, PoolClient, QueryConfig, types} from 'pg';
-import {BaseCategory, Category} from '../../models/category';
-import {BaseExpense, Expense} from '../../models/expense';
-import {BaseIncome, Income} from '../../models/income';
-import {BaseUser, User} from '../../models/user';
-import {Database} from '../database';
+import { Pool, PoolClient, QueryConfig, types } from 'pg';
+import { BaseCategory, Category } from '../../models/category';
+import { BaseExpense, Expense } from '../../models/expense';
+import { BaseIncome, Income } from '../../models/income';
+import { BaseUser, User } from '../../models/user';
+import { Database } from '../database';
 
 export class PgDatabase implements Database {
     private static singleton: PgDatabase | null;
@@ -61,10 +61,10 @@ export class PgDatabase implements Database {
                 if (users.length !== 1) {
                     throw new Error("Credentials don't match");
                 }
-                commit();
+                await commit();
                 return users[0];
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
@@ -86,10 +86,10 @@ export class PgDatabase implements Database {
                 if (users.length !== 1) {
                     throw new Error(`User id ${userId} doesn't exist`);
                 }
-                commit();
+                await commit();
                 return users[0];
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
@@ -107,10 +107,10 @@ export class PgDatabase implements Database {
                 };
                 const queryResults = await client.query<Category>(query);
                 const categories = queryResults.rows;
-                commit();
+                await commit();
                 return categories;
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
@@ -131,10 +131,10 @@ export class PgDatabase implements Database {
                 if (categories.length !== 1) {
                     throw new Error(`Category id ${categoryId} doesn't exist`);
                 }
-                commit();
+                await commit();
                 return categories[0];
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
@@ -161,10 +161,10 @@ export class PgDatabase implements Database {
                 };
                 const queryResults = await client.query<Expense>(query);
                 const expenses = queryResults.rows;
-                commit();
+                await commit();
                 return expenses;
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
@@ -186,10 +186,10 @@ export class PgDatabase implements Database {
                 };
                 const queryResults = await client.query<Expense>(query);
                 const expenses = queryResults.rows;
-                commit();
+                await commit();
                 return expenses;
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
@@ -211,17 +211,17 @@ export class PgDatabase implements Database {
                 };
                 const queryResults = await client.query<Income>(query);
                 const incomes = queryResults.rows;
-                commit();
+                await commit();
                 return incomes;
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
     }
 
     addUser(newUser: BaseUser): Promise<User> {
-        const {email, first_name, last_name, passwd} = newUser;
+        const { email, first_name, last_name, passwd } = newUser;
         return this.transaction<User>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<User>({
@@ -242,7 +242,7 @@ export class PgDatabase implements Database {
     }
 
     editUser(user: User): Promise<User> {
-        const {email, first_name, last_name, passwd, user_id} = user;
+        const { email, first_name, last_name, passwd, user_id } = user;
         return this.transaction<User>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<User>({
@@ -283,16 +283,16 @@ export class PgDatabase implements Database {
                 if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
                     throw new Error(`User ${userId} could not be deleted`);
                 }
-                commit();
+                await commit();
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
     }
 
     addCategory(newCategory: BaseCategory): Promise<Category> {
-        const {user_id, category_name, amount, monthly_default} = newCategory;
+        const { user_id, category_name, amount, monthly_default } = newCategory;
         return this.transaction<Category>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<Category>({
@@ -313,7 +313,7 @@ export class PgDatabase implements Database {
     }
 
     editCategory(category: Category): Promise<Category> {
-        const {category_id, category_name, amount, monthly_default} = category;
+        const { category_id, category_name, amount, monthly_default } = category;
         return this.transaction<Category>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<Category>({
@@ -353,16 +353,16 @@ export class PgDatabase implements Database {
                 if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
                     throw new Error(`Category ${categoryId} could not be deleted`);
                 }
-                commit();
+                await commit();
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
     }
 
     addExpense(newExpense: BaseExpense): Promise<Expense> {
-        const {category_id, amount, expense_date, summary} = newExpense;
+        const { category_id, amount, expense_date, summary } = newExpense;
         return this.transaction<Expense>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<Expense>({
@@ -383,7 +383,7 @@ export class PgDatabase implements Database {
     }
 
     editExpense(expense: Expense): Promise<Expense> {
-        const {category_id, amount, expense_date, summary, expense_id} = expense;
+        const { category_id, amount, expense_date, summary, expense_id } = expense;
         return this.transaction<Expense>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<Expense>({
@@ -424,16 +424,16 @@ export class PgDatabase implements Database {
                 if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
                     throw new Error(`Expense ${expenseId} could not be deleted`);
                 }
-                commit();
+                await commit();
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
     }
 
     addIncome(newIncome: BaseIncome): Promise<Income> {
-        const {amount, income_date, summary} = newIncome;
+        const { amount, income_date, summary } = newIncome;
         return this.transaction<Income>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<Income>({
@@ -454,7 +454,7 @@ export class PgDatabase implements Database {
     }
 
     editIncome(income: Income): Promise<Income> {
-        const {income_id, user_id, amount, income_date, summary} = income;
+        const { income_id, user_id, amount, income_date, summary } = income;
         return this.transaction<Income>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<Income>({
@@ -494,9 +494,9 @@ export class PgDatabase implements Database {
                 if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
                     throw new Error(`Income ${incomeId} could not be deleted`);
                 }
-                commit();
+                await commit();
             } catch (error) {
-                rollback();
+                await rollback();
                 throw error;
             }
         });
