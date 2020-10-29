@@ -25,8 +25,7 @@ UPDATE incomes
 SET amount = '123456789',
     income_date = '12/31/2020',
     description = 'Last Paycheck'
-WHERE income_id = 1
-  AND user_id = 2;
+WHERE income_id = 1;
 
 /*
 To delete an income entry
@@ -34,5 +33,4 @@ for DELETE - delete income
 */
 DELETE
 FROM incomes
-WHERE income_id = 1
-  AND user_id = 2;
+WHERE income_id = 1;
