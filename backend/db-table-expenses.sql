@@ -2,7 +2,6 @@
   These are template SQL statements with dummy data for each of the expense routes
  */
 
-
 /*
  To insert a new expense
  for POST - create expense
