@@ -195,6 +195,10 @@ export class PgDatabase implements Database {
         });
     }
 
+    /**
+     * Gets all incomes for a specified user.
+     * @param userId the userID key
+     */
     getIncomes(userId: number): Promise<Income[]> {
         return this.transaction<Income[]>(async (client, commit, rollback) => {
             try {
@@ -207,11 +211,8 @@ export class PgDatabase implements Database {
                 };
                 const queryResults = await client.query<Income>(query);
                 const incomes = queryResults.rows;
-                if (incomes.length !== 1) {
-                    throw new Error(`User id ${userId} doesn't exist`);
-                }
                 commit();
-                return incomes[0];
+                return incomes;
             } catch (error) {
                 rollback();
                 throw error;
@@ -321,7 +322,7 @@ export class PgDatabase implements Database {
                 const queryResult = await client.query<Income>({
                     text: `
                         INSERT INTO incomes (amount, income_date, summary)
-                        VALUES ($1, $2, $3);
+                        VALUES ($1, $2, $3)
                         RETURNING *;`,
                     values: [amount, income_date, summary],
                 });
