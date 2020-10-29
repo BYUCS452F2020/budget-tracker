@@ -42,5 +42,4 @@ WHERE category_id = 2;
  */
 DELETE
 FROM categories
-WHERE user_id = 1
-  AND category_id = 2;
+WHERE category_id = 2;

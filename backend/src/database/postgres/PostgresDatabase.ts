@@ -341,7 +341,24 @@ export class PgDatabase implements Database {
     }
 
     deleteCategory(categoryId: number): Promise<void> {
-        throw new Error('Method not implemented.');
+        return this.transaction<void>(async (client, commit, rollback) => {
+            try {
+                const queryResult = await client.query({
+                    text: `
+                        DELETE
+                        FROM categories
+                        WHERE category_id = $1;`,
+                    values: [categoryId],
+                });
+                if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+                    throw new Error(`Category ${categoryId} could not be deleted`);
+                }
+                commit();
+            } catch (error) {
+                rollback();
+                throw error;
+            }
+        });
     }
 
     addExpense(newExpense: BaseExpense): Promise<Expense> {
@@ -395,7 +412,24 @@ export class PgDatabase implements Database {
     }
 
     deleteExpense(expenseId: number): Promise<void> {
-        throw new Error('Method not implemented.');
+        return this.transaction<void>(async (client, commit, rollback) => {
+            try {
+                const queryResult = await client.query({
+                    text: `
+                        DELETE
+                        FROM expenses
+                        WHERE expense_id = $1;`,
+                    values: [expenseId],
+                });
+                if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+                    throw new Error(`Expense ${expenseId} could not be deleted`);
+                }
+                commit();
+            } catch (error) {
+                rollback();
+                throw error;
+            }
+        });
     }
 
     addIncome(newIncome: BaseIncome): Promise<Income> {
