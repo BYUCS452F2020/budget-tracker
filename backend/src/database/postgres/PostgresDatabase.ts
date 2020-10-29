@@ -129,6 +129,10 @@ export class PgDatabase implements Database {
     });
   }
 
+  getCategoryExpenses(categoryId: number): Promise<Expense[]> {
+    throw new Error('Method not implemented.');
+  }
+
   getIncomes(userId: number): Promise<Income[]> {
     throw new Error('Method not implemented.');
   }

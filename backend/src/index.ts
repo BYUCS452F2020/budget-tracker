@@ -6,6 +6,8 @@ import { expenseRouter } from './routes/expense.routes';
 import { incomeRouter } from './routes/income.routes';
 import { userRouter } from './routes/user.routes';
 
+export type ParamsDictionary = { [key: string]: string };
+
 // loads the vars in ./.env file
 dotenv.config();
 

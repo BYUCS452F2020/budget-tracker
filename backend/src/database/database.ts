@@ -9,6 +9,7 @@ export interface Database {
   getCategories(userId: number): Promise<Category[]>;
   getCategory(categoryId: number): Promise<Category>;
   getExpenses(userId: number): Promise<Expense[]>;
+  getCategoryExpenses(categoryId: number): Promise<Expense[]>;
   getIncomes(userId: number): Promise<Income[]>;
 
   addUser(newUser: BaseUser): Promise<User>;
