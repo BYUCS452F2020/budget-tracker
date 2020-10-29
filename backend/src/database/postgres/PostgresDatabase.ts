@@ -292,7 +292,24 @@ export class PgDatabase implements Database {
     }
 
     addCategory(newCategory: BaseCategory): Promise<Category> {
-        throw new Error('Method not implemented.');
+        const {user_id, category_name, amount, monthly_default} = newCategory;
+        return this.transaction<Category>(async (client, commit, rollback) => {
+            try {
+                const queryResult = await client.query<Category>({
+                    text: `
+                        INSERT INTO categories (user_id, category_name, amount, monthly_default)
+                        VALUES ($1, $2, $3, $4)
+                        RETURNING *;`,
+                    values: [user_id, category_name, amount, monthly_default],
+                });
+                const createdCategory = queryResult.rows[0];
+                await commit();
+                return createdCategory;
+            } catch (error) {
+                await rollback();
+                throw error;
+            }
+        });
     }
 
     editCategory(category: Category): Promise<Category> {
@@ -304,7 +321,24 @@ export class PgDatabase implements Database {
     }
 
     addExpense(newExpense: BaseExpense): Promise<Expense> {
-        throw new Error('Method not implemented.');
+        const {category_id, amount, expense_date, summary} = newExpense;
+        return this.transaction<Expense>(async (client, commit, rollback) => {
+            try {
+                const queryResult = await client.query<Expense>({
+                    text: `
+                        INSERT INTO expenses (category_id, amount, expense_date, summary)
+                        VALUES ($1, $2, $3, $4)
+                        RETURNING *;`,
+                    values: [category_id, amount, expense_date, summary],
+                });
+                const createdExpense = queryResult.rows[0];
+                await commit();
+                return createdExpense;
+            } catch (error) {
+                await rollback();
+                throw error;
+            }
+        });
     }
 
     editExpense(expense: Expense): Promise<Expense> {
