@@ -154,6 +154,7 @@ export class PgDatabase implements Database {
                                expenses.summary,
                                round(expenses.amount::numeric, 2) AS amount,
                                expenses.expense_date,
+                               expenses.category_id,
                                categories.category_name,
                                round(categories.amount::numeric, 2) AS total_category_amount
                         FROM expenses
