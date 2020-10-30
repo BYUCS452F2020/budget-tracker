@@ -6,7 +6,7 @@ import { BaseUser, User } from '../../models/user';
 import { Database } from '../database';
 
 export class PgDatabase implements Database {
-    private static singleton: PgDatabase | null;
+    private static singleton: PgDatabase | null = null;
     private static readonly pool = new Pool();
 
     static instance(): PgDatabase {
@@ -100,7 +100,7 @@ export class PgDatabase implements Database {
             try {
                 const query = {
                     text: `
-                        SELECT category_name, amount, monthly_default
+                        SELECT *
                         FROM categories
                         WHERE categories.user_id = $1;`,
                     values: [userId],
@@ -149,8 +149,10 @@ export class PgDatabase implements Database {
             try {
                 const query = {
                     text: `
-                        SELECT expenses.summary,
-                               round(expenses.amount::numeric, 2)   AS amount_spent,
+                        SELECT 
+                               expenses.expense_id,
+                               expenses.summary,
+                               round(expenses.amount::numeric, 2) AS amount,
                                expenses.expense_date,
                                categories.category_name,
                                round(categories.amount::numeric, 2) AS total_category_amount
@@ -280,7 +282,7 @@ export class PgDatabase implements Database {
                         WHERE user_id = $1;`,
                     values: [userId],
                 });
-                if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+                if (queryResult.rowCount !== 1) {
                     throw new Error(`User ${userId} could not be deleted`);
                 }
                 await commit();
@@ -297,9 +299,9 @@ export class PgDatabase implements Database {
             try {
                 const queryResult = await client.query<Category>({
                     text: `
-                        INSERT INTO categories (user_id, category_name, amount, monthly_default)
-                        VALUES ($1, $2, $3, $4)
-                        RETURNING *;`,
+                    INSERT INTO categories (user_id, category_name, amount, monthly_default)
+                    VALUES ($1, $2, $3, $4)
+                    RETURNING *;`,
                     values: [user_id, category_name, amount, monthly_default],
                 });
                 const createdCategory = queryResult.rows[0];
@@ -350,7 +352,7 @@ export class PgDatabase implements Database {
                         WHERE category_id = $1;`,
                     values: [categoryId],
                 });
-                if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+                if (queryResult.rowCount !== 1) {
                     throw new Error(`Category ${categoryId} could not be deleted`);
                 }
                 await commit();
@@ -421,7 +423,7 @@ export class PgDatabase implements Database {
                         WHERE expense_id = $1;`,
                     values: [expenseId],
                 });
-                if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+                if (queryResult.rowCount !== 1) {
                     throw new Error(`Expense ${expenseId} could not be deleted`);
                 }
                 await commit();
@@ -433,15 +435,15 @@ export class PgDatabase implements Database {
     }
 
     addIncome(newIncome: BaseIncome): Promise<Income> {
-        const { amount, income_date, summary } = newIncome;
+        const { amount, income_date, summary, user_id } = newIncome;
         return this.transaction<Income>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query<Income>({
                     text: `
-                        INSERT INTO incomes (amount, income_date, summary)
-                        VALUES ($1, $2, $3)
+                        INSERT INTO incomes (amount, income_date, summary, user_id)
+                        VALUES ($1, $2, $3, $4)
                         RETURNING *;`,
-                    values: [amount, income_date, summary],
+                    values: [amount, income_date, summary, user_id],
                 });
                 const createdIncome = queryResult.rows[0];
                 await commit();
@@ -491,7 +493,7 @@ export class PgDatabase implements Database {
                         WHERE income_id = $1;`,
                     values: [incomeId],
                 });
-                if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+                if (queryResult.rowCount !== 1) {
                     throw new Error(`Income ${incomeId} could not be deleted`);
                 }
                 await commit();
