@@ -22,6 +22,8 @@ export class PgDatabase implements Database {
         types.setTypeParser(701, parseFloat); // 701 represents double precision in pg
     }
 
+    async init(): Promise<void> {}
+
     private async transaction<T>(
         action: (c: PoolClient, commit: () => Promise<void>, rollback: () => Promise<void>) => Promise<T>,
     ): Promise<T> {
