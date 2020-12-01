@@ -35,6 +35,7 @@ async function setup() {
     const user = await UserModel.create({
         email: 'nate',
         first_name: 'Nate',
+        last_name: 'NateLast',
         passwd: 'hello',
         unallocated_funds: 10,
     });
@@ -49,12 +50,15 @@ async function setup() {
 
     // example of finding an income by user (could also use user's object id)
     const income = await IncomeModel.findOne({ user: user });
+    const income2 = await IncomeModel.find({ user: user._id });
 
     // populate actually adds the user object to the user field instead of just an id
     // make sure to run execPopulate();
     await income.populate('user').execPopulate();
+    await income2[0].populate('user').execPopulate();
 
     console.log('found income', income);
+    console.log('found income2', income2);
 
     return app;
 }

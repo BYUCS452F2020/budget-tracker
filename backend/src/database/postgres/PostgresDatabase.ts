@@ -73,7 +73,7 @@ export class PgDatabase implements Database {
         return user;
     }
 
-    getUser(userId: number): Promise<User> {
+    getUser(userId: string): Promise<User> {
         return this.transaction<User>(async (client, commit, rollback) => {
             try {
                 const query = {
