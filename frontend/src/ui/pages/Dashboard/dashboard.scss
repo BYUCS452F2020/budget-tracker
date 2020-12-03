@@ -1,0 +1,18 @@
+.MuiTable-root {
+  .MuiTableBody-root {
+    .MuiTableRow-root {
+      .MuiTableCell-root {
+        div {
+          width: 100%;
+        }
+        .MuiFormControl-root {
+          .MuiInputBase-root {
+            input {
+              text-align: left !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
