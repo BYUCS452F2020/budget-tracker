@@ -1,10 +1,8 @@
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
-import { Document } from 'mongoose';
 import { DatabaseFactory } from './database/database-factory';
 import { IncomeModel, UserModel } from './database/mongo/MongoDatabase';
-import { User } from './models/user';
 import { categoryRouter } from './routes/category.routes';
 import { expenseRouter } from './routes/expense.routes';
 import { incomeRouter } from './routes/income.routes';
@@ -79,8 +77,6 @@ async function setup() {
 
     return app;
 }
-
-interface Foo extends Partial<User>, Document {}
 
 setup().then((app) => {
     app.listen(port, () => {
