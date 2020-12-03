@@ -7,7 +7,7 @@ export interface Database {
     init(): Promise<void>;
 
     loginUser(email: string, passwd: string): Promise<User>;
-    getUser(userId: number): Promise<User>;
+    getUser(userId: string): Promise<User>;
     getCategories(userId: number): Promise<Category[]>;
     getCategory(categoryId: number): Promise<Category>;
     getExpenses(userId: number): Promise<Expense[]>;
