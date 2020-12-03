@@ -1,8 +1,8 @@
 import { Database } from './database';
-import { MongoDatabase } from './mongo/MongoDatabase';
+import { PgDatabase } from './postgres/PostgresDatabase';
 
 export class DatabaseFactory {
     static getDatabase(): Database {
-        return MongoDatabase.instance();
+        return PgDatabase.instance();
     }
 }
