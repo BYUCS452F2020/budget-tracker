@@ -10,10 +10,9 @@ import { CreateUserPayload, User } from '../models/user';
 const userRouter = express.Router({ mergeParams: true });
 const db = DatabaseFactory.getDatabase();
 
-// TODO all id's as numbers change to strings
-
 userRouter.post('/', async (req: Request<ParamsDictionary, User, CreateUserPayload>, res) => {
     try {
+        console.log(`reqBody: ${req.body}`);
         const user = await db.addUser(req.body);
         res.send(user);
     } catch (error) {

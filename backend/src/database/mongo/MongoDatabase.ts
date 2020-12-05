@@ -1,9 +1,16 @@
 import mongoose from 'mongoose';
-import {Category} from '../../models/category';
-import {Expense} from '../../models/expense';
-import {Income} from '../../models/income';
+import {BaseCategory, Category} from '../../models/category';
+import {BaseExpense, Expense} from '../../models/expense';
+import {BaseIncome, Income} from '../../models/income';
 import {BaseUser, User} from '../../models/user';
 import {Database} from '../database';
+
+// TODO update allocated funds when creating categories...
+// TODO etc. expense vs categories
+
+// ******************
+// Schemas and models
+// ******************
 
 export const UserSchema = new mongoose.Schema({
     email: String,
@@ -48,6 +55,14 @@ export const ExpenseSchema = new mongoose.Schema({
 });
 export const ExpenseModel = mongoose.model('Expense', ExpenseSchema);
 
+// this is to resolve some deprecation warnings
+mongoose.set('useFindAndModify', false);
+mongoose.set('useUnifiedTopology', true);
+
+// ****************************
+// MongoDatabase implementation
+// ****************************
+
 export class MongoDatabase implements Database {
     private static singleton: MongoDatabase | null = null;
 
@@ -63,61 +78,131 @@ export class MongoDatabase implements Database {
     }
 
     loginUser(email: string, passwd: string): Promise<User> {
+        // todo this is a post, see pg
         throw new Error('Method not implemented.');
     }
 
-    async getUser(userId: string): Promise<User> {
-        const user: any = await UserModel.findById(userId);
-        return {
-            user_id: user._id,
-            email: user.email,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            passwd: user.passwd,
-            unallocated_funds: user.unallocated_funds,
-        };
-    }
+    getUser(userId: string): Promise<User> {
+        let userGetPromise: any = UserModel.findById(userId);
+        return userGetPromise.then(
+            (res: any) => {
+                console.log(`Retrieved ${res} user document.`);
+                return {
+                    user_id: res._id,
+                    email: res.email,
+                    first_name: res.first_name,
+                    last_name: res.last_name,
+                    passwd: res.passwd,
+                    unallocated_funds: res.unallocated_funds,
+                };
+            }
+        )
+    };
 
-    getCategories(userId: string): Promise<Category[]> {
-        throw new Error('Method not implemented.');
+    async getCategories(userId: string): Promise<Category[]> {
+        let balanceCategories: Category[];
+        balanceCategories = [];
+        let mongoCategories: any[];
+        mongoCategories = await CategoryModel.find({user: userId});
+        mongoCategories.forEach(category => {
+            console.log(`Retrieved ${category} category from document.`);
+            balanceCategories.push({
+                category_id: category._id,
+                user_id: category.user_id,
+                category_name: category.category_name,
+                amount: category.amount,
+                monthly_default: category.monthly_default
+            })
+        });
+        return balanceCategories;
+
     }
 
     getCategory(categoryId: string): Promise<Category> {
-        throw new Error('Method not implemented.');
+        let categoryGetPromise: any = CategoryModel.findById(categoryId);
+        return categoryGetPromise.then(
+            (res: any) => {
+                console.log(`Retrieved ${res} category document.`);
+                return {
+                    category_id: res._id,
+                    category_name: res.category_name,
+                    amount: res.amount,
+                    monthly_default: res.monthly_default,
+                    user: res.user,
+                };
+            }
+        )
     }
 
-    getExpenses(userId: string): Promise<Expense[]> {
-        // empty array of expenses
-        // ExpenseModel.find(userid
-        // iterate each of those (mongo objects)
-        // construct (our) Expense objects
-        // push into empty array
-        // return it
-        throw new Error('Method not implemented.');
+    // fixme need to lookup user from category...
+    async getExpenses(userId: string): Promise<Expense[]> {
+        let results: Expense[];
+        results = [];
+        let expenses: any[];
+        expenses = await ExpenseModel.find({user: userId});
+        expenses.forEach(expense => {
+            console.log(`Retrieved ${expense} expense from document.`);
+            results.push({
+                expense_id: expense._id,
+                category_id: expense.category_id,
+                expense_date: expense.expense_date,
+                amount: expense.amount,
+                summary: expense.summary,
+            })
+        });
+        return results;
     }
 
-    getCategoryExpenses(categoryId: string): Promise<Expense[]> {
-        throw new Error('Method not implemented.');
+    async getCategoryExpenses(categoryId: string): Promise<Expense[]> {
+        let results: Expense[];
+        results = [];
+        let expenses: any[];
+        expenses = await ExpenseModel.find({category: categoryId});
+        expenses.forEach(expense => {
+            console.log(`Retrieved ${expense} expense from document.`);
+            results.push({
+                expense_id: expense._id,
+                category_id: expense.category_id,
+                expense_date: expense.expense_date,
+                amount: expense.amount,
+                summary: expense.summary,
+            })
+        });
+        return results;
     }
 
-    getIncomes(userId: string): Promise<Income[]> {
-        throw new Error('Method not implemented.');
+    async getIncomes(userId: string): Promise<Income[]> {
+        let results: Income[];
+        results = [];
+        let incomes: any[];
+        incomes = await IncomeModel.find({user: userId});
+        incomes.forEach(income => {
+            console.log(`Retrieved ${income} income from document.`);
+            results.push({
+                income_id: income._id,
+                user_id: income.user_id,
+                amount: income.amount,
+                summary: income.summary,
+                income_date: income.income_date
+            })
+        });
+        return results;
     }
 
     addUser(newUser: BaseUser): Promise<User> {
-        let userPromise = UserModel.create({
+        console.log(`NewUser is ${newUser}`);
+        let userAddPromise = UserModel.create({
             email: newUser.email,
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             passwd: newUser.passwd,
             unallocated_funds: newUser.unallocated_funds,
         });
-        return userPromise.then(
+        return userAddPromise.then(
             (res: any) => {
-
-                console.log(`Created ${res} document.`);
+                console.log(`Created ${res} user document.`);
                 return {
-                    user_id: res._id, // todo make sure it's treated as a string in other places
+                    user_id: res._id,
                     email: res.email,
                     first_name: res.first_name,
                     last_name: res.last_name,
@@ -129,16 +214,43 @@ export class MongoDatabase implements Database {
     }
 
     editUser(user: User): Promise<User> {
-        throw new Error('Method not implemented.');
+        let userUpdatePromise = UserModel.findByIdAndUpdate(user.user_id,
+            {
+                user_id: user.user_id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                passwd: user.passwd,
+                unallocated_funds: user.unallocated_funds,
+            }
+        );
+
+        return userUpdatePromise.then(
+            (res: any) => {
+                console.log(`Updated ${res} user document.`);
+                return {
+                    user_id: res._id,
+                    email: res.email,
+                    first_name: res.first_name,
+                    last_name: res.last_name,
+                    passwd: res.passwd,
+                    unallocated_funds: res.unallocated_funds,
+                };
+            }
+        );
     }
 
     deleteUser(userId: string): Promise<void> {
-        throw new Error('Method not implemented.');
+        let userDeletePromise = UserModel.deleteOne({_id: userId});
+        return userDeletePromise.then(
+            (res: any) => {
+                console.log(`Deleted a user.`);
+                return;
+            }
+        );
     }
 
-    addCategory(
-        newCategory: Pick<Category, 'user_id' | 'category_name' | 'amount' | 'monthly_default'>,
-    ): Promise<Category> {
+    addCategory(newCategory: BaseCategory,): Promise<Category> {
         throw new Error('Method not implemented.');
     }
 
@@ -147,10 +259,16 @@ export class MongoDatabase implements Database {
     }
 
     deleteCategory(categoryId: string): Promise<void> {
-        throw new Error('Method not implemented.');
+        let categoryDeletePromise = CategoryModel.deleteOne({_id: categoryId});
+        return categoryDeletePromise.then(
+            (res: any) => {
+                console.log(`Deleted a category.`);
+                return;
+            }
+        );
     }
 
-    addExpense(newExpense: Pick<Expense, 'category_id' | 'amount' | 'expense_date' | 'summary'>): Promise<Expense> {
+    addExpense(newExpense: BaseExpense): Promise<Expense> {
         throw new Error('Method not implemented.');
     }
 
@@ -159,10 +277,16 @@ export class MongoDatabase implements Database {
     }
 
     deleteExpense(expenseId: string): Promise<void> {
-        throw new Error('Method not implemented.');
+        let expenseDeletePromise = ExpenseModel.deleteOne({_id: expenseId});
+        return expenseDeletePromise.then(
+            (res: any) => {
+                console.log(`Deleted an expense.`);
+                return;
+            }
+        );
     }
 
-    addIncome(newIncome: Pick<Income, 'user_id' | 'amount' | 'summary' | 'income_date'>): Promise<Income> {
+    addIncome(newIncome: BaseIncome): Promise<Income> {
         throw new Error('Method not implemented.');
     }
 
@@ -171,6 +295,12 @@ export class MongoDatabase implements Database {
     }
 
     deleteIncome(incomeId: string): Promise<void> {
-        throw new Error('Method not implemented.');
+        let incomeDeletePromise = IncomeModel.deleteOne({_id: incomeId});
+        return incomeDeletePromise.then(
+            (res: any) => {
+                console.log(`Deleted an income.`);
+                return;
+            }
+        );
     }
 }

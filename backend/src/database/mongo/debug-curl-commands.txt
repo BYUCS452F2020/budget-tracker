@@ -1,0 +1,66 @@
+// *****
+// Gets
+// *****
+
+// getUser
+curl -XGET 'localhost:3001/users/5fcbf6a7dbfbf8138c99a416'
+
+// getCategories
+curl -XGET 'localhost:3001/users/5fcbe762534f3c53006091af/categories'
+
+// getCategory
+curl -XGET 'localhost:3001/users/5fcbed63fd9a650600b37102/categories/5fcbed63fd9a650600b37104'
+
+// getExpenses // todo broken...
+curl -XGET 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/expenses'
+
+// getCategoryExpenses
+curl -XGET 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/categories/5fcbeb5b88fdb6295825e8df/expenses'
+
+// getIncomes
+curl -XGET 'localhost:3001/users/5fcbf44bdbfbf8138c99a410/incomes'
+
+
+// ****
+// Adds
+// ****
+
+
+
+
+// *******
+// Deletes
+// *******
+
+// deleteUser
+curl -XDELETE 'localhost:3001/users/5fcbebc9dc55af1754b92596'
+
+// deleteCategory
+curl -XDELETE 'localhost:3001/users/5fcbe762534f3c53006091af/categories/5fcbe762534f3c53006091b2'
+
+// deleteExpense
+curl -XDELETE 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/categories/5fcbeb5b88fdb6295825e8df/expenses/5fcbeb5b88fdb6295825e8e0'
+
+// deleteIncome
+curl -XDELETE 'localhost:3001/users/5fcbebc9dc55af1754b92596/incomes/5fcbebc9dc55af1754b92597'
+
+
+// Adds
+
+// AddUser
+
+curl -XPOST -H "Content-type: application/json" -d '{"email": "testCreate@gmail.com", "first_name": "test", "last_name": "create", "passwd": "badPass", "unallocated_funds": 10}' 'http://localhost:3001/users'
+
+
+
+// todo LoginUser
+
+// UpdateUser // todo update like the json on add
+
+curl -XPUT -d '{
+    email: 'testEdit@gmail.com',
+    first_name: 'test',
+    last_name: 'edit',
+    passwd: 'badPass',
+    unallocated_funds: 10,
+}' 'localhost:3001/users/5fcbd04369ee694b14c6958e'
