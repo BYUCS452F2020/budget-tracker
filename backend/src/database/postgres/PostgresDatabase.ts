@@ -5,6 +5,7 @@ import { BaseIncome, Income } from '../../models/income';
 import { BaseUser, User } from '../../models/user';
 import { Database } from '../database';
 
+// Todo: test that pgDatabase still works after the switch from int id's to string id's
 export class PgDatabase implements Database {
     private static singleton: PgDatabase | null = null;
     private static readonly pool = new Pool();
@@ -97,7 +98,7 @@ export class PgDatabase implements Database {
         });
     }
 
-    getCategories(userId: number): Promise<Category[]> {
+    getCategories(userId: string): Promise<Category[]> {
         return this.transaction<Category[]>(async (client, commit, rollback) => {
             try {
                 const query = {
@@ -118,7 +119,7 @@ export class PgDatabase implements Database {
         });
     }
 
-    getCategory(categoryId: number): Promise<Category> {
+    getCategory(categoryId: string): Promise<Category> {
         return this.transaction<Category>(async (client, commit, rollback) => {
             try {
                 const query = {
@@ -146,7 +147,7 @@ export class PgDatabase implements Database {
      * Get all user expenses across all categories.
      * @param userId the userID key
      */
-    getExpenses(userId: number): Promise<Expense[]> {
+    getExpenses(userId: string): Promise<Expense[]> {
         return this.transaction<Expense[]>(async (client, commit, rollback) => {
             try {
                 const query = {
@@ -179,7 +180,7 @@ export class PgDatabase implements Database {
      * Get all expenses for a user in just one specific category
      * @param categoryId the categoryID key
      */
-    getCategoryExpenses(categoryId: number): Promise<Expense[]> {
+    getCategoryExpenses(categoryId: string): Promise<Expense[]> {
         return this.transaction<Expense[]>(async (client, commit, rollback) => {
             try {
                 const query = {
@@ -204,7 +205,7 @@ export class PgDatabase implements Database {
      * Gets all incomes for a specified user.
      * @param userId the userID key
      */
-    getIncomes(userId: number): Promise<Income[]> {
+    getIncomes(userId: string): Promise<Income[]> {
         return this.transaction<Income[]>(async (client, commit, rollback) => {
             try {
                 const query = {
@@ -275,7 +276,7 @@ export class PgDatabase implements Database {
         });
     }
 
-    deleteUser(userId: number): Promise<void> {
+    deleteUser(userId: string): Promise<void> {
         return this.transaction<void>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query({
@@ -345,7 +346,7 @@ export class PgDatabase implements Database {
         });
     }
 
-    deleteCategory(categoryId: number): Promise<void> {
+    deleteCategory(categoryId: string): Promise<void> {
         return this.transaction<void>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query({
@@ -416,7 +417,7 @@ export class PgDatabase implements Database {
         });
     }
 
-    deleteExpense(expenseId: number): Promise<void> {
+    deleteExpense(expenseId: string): Promise<void> {
         return this.transaction<void>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query({
@@ -486,7 +487,7 @@ export class PgDatabase implements Database {
         });
     }
 
-    deleteIncome(incomeId: number): Promise<void> {
+    deleteIncome(incomeId: string): Promise<void> {
         return this.transaction<void>(async (client, commit, rollback) => {
             try {
                 const queryResult = await client.query({

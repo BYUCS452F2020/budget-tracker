@@ -22,9 +22,8 @@ incomeRouter.post('/', async (req: Request<ParamsDictionary, Income, CreateIncom
 });
 
 incomeRouter.get('/', async (req: Request<ParamsDictionary, Income[]>, res) => {
-    const userId = parseInt(req.params.userId);
     try {
-        const incomes = await db.getIncomes(userId);
+        const incomes = await db.getIncomes(req.params.userId);
         res.send(incomes);
     } catch (error) {
         res.send(error.message).status(500);
@@ -43,9 +42,8 @@ incomeRouter.put('/:incomeId', async (req: Request<ParamsDictionary, Income, Inc
 });
 
 incomeRouter.delete('/:incomeId', async (req: Request<ParamsDictionary>, res) => {
-    const incomeId = parseInt(req.params.incomeId);
     try {
-        await db.deleteIncome(incomeId);
+        await db.deleteIncome(req.params.incomeId);
         res.sendStatus(204);
     } catch (error) {
         res.send(error.message).status(500);

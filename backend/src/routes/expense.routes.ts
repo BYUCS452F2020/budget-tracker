@@ -22,9 +22,8 @@ expenseRouter.post('/', async (req: Request<ParamsDictionary, Expense, CreateExp
 });
 
 expenseRouter.get('/', async (req: Request<ParamsDictionary, Expense[]>, res) => {
-    const categoryId = parseInt(req.params.categoryId);
     try {
-        const expenses = await db.getCategoryExpenses(categoryId);
+        const expenses = await db.getCategoryExpenses(req.params.categoryId);
         res.send(expenses);
     } catch (error) {
         res.send(error.message).status(500);
@@ -42,10 +41,9 @@ expenseRouter.put('/:expenseId', async (req: Request<ParamsDictionary, Expense, 
     }
 });
 
-expenseRouter.delete('/:expenseId', async (req, res) => {
-    const expenseId = parseInt(req.params.expenseId);
+expenseRouter.delete('/:expenseId', async (req : Request<ParamsDictionary>, res) => {
     try {
-        await db.deleteExpense(expenseId);
+        await db.deleteExpense(req.params.expenseId);
         res.sendStatus(204);
     } catch (error) {
         res.send(error.message).status(500);

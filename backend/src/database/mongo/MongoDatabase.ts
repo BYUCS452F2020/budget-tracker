@@ -78,16 +78,15 @@ export class MongoDatabase implements Database {
         };
     }
 
-    getCategories(userId: number): Promise<Category[]> {
+    getCategories(userId: string): Promise<Category[]> {
         throw new Error('Method not implemented.');
     }
 
-    getCategory(categoryId: number): Promise<Category> {
+    getCategory(categoryId: string): Promise<Category> {
         throw new Error('Method not implemented.');
     }
 
-    // todo change to string
-    getExpenses(userId: number): Promise<Expense[]> {
+    getExpenses(userId: string): Promise<Expense[]> {
         // empty array of expenses
         // ExpenseModel.find(userid
         // iterate each of those (mongo objects)
@@ -97,11 +96,11 @@ export class MongoDatabase implements Database {
         throw new Error('Method not implemented.');
     }
 
-    getCategoryExpenses(categoryId: number): Promise<Expense[]> {
+    getCategoryExpenses(categoryId: string): Promise<Expense[]> {
         throw new Error('Method not implemented.');
     }
 
-    getIncomes(userId: number): Promise<Income[]> {
+    getIncomes(userId: string): Promise<Income[]> {
         throw new Error('Method not implemented.');
     }
 
@@ -133,7 +132,7 @@ export class MongoDatabase implements Database {
         throw new Error('Method not implemented.');
     }
 
-    deleteUser(userId: number): Promise<void> {
+    deleteUser(userId: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
@@ -147,7 +146,7 @@ export class MongoDatabase implements Database {
         throw new Error('Method not implemented.');
     }
 
-    deleteCategory(categoryId: number): Promise<void> {
+    deleteCategory(categoryId: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
@@ -159,7 +158,7 @@ export class MongoDatabase implements Database {
         throw new Error('Method not implemented.');
     }
 
-    deleteExpense(expenseId: number): Promise<void> {
+    deleteExpense(expenseId: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
@@ -171,7 +170,7 @@ export class MongoDatabase implements Database {
         throw new Error('Method not implemented.');
     }
 
-    deleteIncome(incomeId: number): Promise<void> {
+    deleteIncome(incomeId: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
 }
