@@ -1,3 +1,7 @@
+
+// todo LoginUser
+
+
 // *****
 // Gets
 // *****
@@ -15,7 +19,7 @@ curl -XGET 'localhost:3001/users/5fcbed63fd9a650600b37102/categories/5fcbed63fd9
 curl -XGET 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/expenses'
 
 // getCategoryExpenses
-curl -XGET 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/categories/5fcbeb5b88fdb6295825e8df/expenses'
+curl -XGET 'localhost:3001/users/trashId/categories/5fcc27f92d1a710a3c2ab69d/expenses'
 
 // getIncomes
 curl -XGET 'localhost:3001/users/5fcbf44bdbfbf8138c99a410/incomes'
@@ -25,8 +29,15 @@ curl -XGET 'localhost:3001/users/5fcbf44bdbfbf8138c99a410/incomes'
 // Adds
 // ****
 
+// AddUser
+curl -XPOST -H "Content-type: application/json" -d '{"email": "testCreate@gmail.com", "first_name": "test", "last_name": "create", "passwd": "badPass", "unallocated_funds": 10}' 'http://localhost:3001/users'
 
+// addCategory
+curl -XPOST -H "Content-type: application/json" -d '{"user_id": "5fcc2ff73007e23698364329", "category_name": "rent", "amount": 125, "monthly_default": 200}' 'http://localhost:3001/users/5fcc2ff73007e23698364329/categories'
 
+// addExpense
+
+// addIncome
 
 // *******
 // Deletes
@@ -45,15 +56,7 @@ curl -XDELETE 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/categories/5fcbeb5b
 curl -XDELETE 'localhost:3001/users/5fcbebc9dc55af1754b92596/incomes/5fcbebc9dc55af1754b92597'
 
 
-// Adds
 
-// AddUser
-
-curl -XPOST -H "Content-type: application/json" -d '{"email": "testCreate@gmail.com", "first_name": "test", "last_name": "create", "passwd": "badPass", "unallocated_funds": 10}' 'http://localhost:3001/users'
-
-
-
-// todo LoginUser
 
 // UpdateUser // todo update like the json on add
 

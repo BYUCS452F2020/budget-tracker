@@ -1,6 +1,6 @@
 export type Income = {
-  income_id: number;
-  user_id: number;
+  income_id: string;
+  user_id: string;
   amount: number;
   income_date: Date;
   summary: string | null;

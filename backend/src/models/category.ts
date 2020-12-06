@@ -1,6 +1,6 @@
 export type Category = {
-  category_id: number;
-  user_id: number;
+  category_id: string;
+  user_id: string;
   category_name: string;
   amount: number;
   monthly_default: number | null;

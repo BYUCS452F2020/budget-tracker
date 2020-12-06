@@ -78,7 +78,7 @@ export class MongoDatabase implements Database {
     }
 
     loginUser(email: string, passwd: string): Promise<User> {
-        // todo this is a post, see pg
+        // TODO this is a post, see pg
         throw new Error('Method not implemented.');
     }
 
@@ -134,33 +134,37 @@ export class MongoDatabase implements Database {
         )
     }
 
-    // fixme need to lookup user from category...
+    // FIXME need to lookup user from category...
     async getExpenses(userId: string): Promise<Expense[]> {
-        let results: Expense[];
-        results = [];
-        let expenses: any[];
-        expenses = await ExpenseModel.find({user: userId});
-        expenses.forEach(expense => {
-            console.log(`Retrieved ${expense} expense from document.`);
-            results.push({
-                expense_id: expense._id,
-                category_id: expense.category_id,
-                expense_date: expense.expense_date,
-                amount: expense.amount,
-                summary: expense.summary,
-            })
-        });
-        return results;
+        throw new Error('Method not implemented.');
+        // let allUserExpenses : Expense[] = [];
+        //
+        // let balanceCategories = await this.getCategories(userId);
+        //
+        // balanceCategories.forEach(category => {
+        //     let mongoExpenses: any[];
+        //     mongoExpenses = await ExpenseModel.find({user: userId});
+        //     allUserExpenses = allUserExpenses.concat(this.getExpensesFromMongoExpenses(mongoExpenses));
+        // });
+        //
+        // return allUserExpenses;
     }
 
     async getCategoryExpenses(categoryId: string): Promise<Expense[]> {
-        let results: Expense[];
-        results = [];
-        let expenses: any[];
-        expenses = await ExpenseModel.find({category: categoryId});
-        expenses.forEach(expense => {
+        let mongoExpenses: any[];
+        mongoExpenses = await ExpenseModel.find({category: categoryId});
+        return this.getExpensesFromMongoExpenses(mongoExpenses);
+    }
+
+    /**
+     * A helper function for getExpenses() and getCategoryExpenses()
+     */
+    getExpensesFromMongoExpenses(mongoPromise: any[]): Expense[] {
+        let balanceExpenses: Expense[];
+        balanceExpenses = [];
+        mongoPromise.forEach(expense => {
             console.log(`Retrieved ${expense} expense from document.`);
-            results.push({
+            balanceExpenses.push({
                 expense_id: expense._id,
                 category_id: expense.category_id,
                 expense_date: expense.expense_date,
@@ -168,7 +172,8 @@ export class MongoDatabase implements Database {
                 summary: expense.summary,
             })
         });
-        return results;
+
+        return balanceExpenses;
     }
 
     async getIncomes(userId: string): Promise<Income[]> {
@@ -251,7 +256,25 @@ export class MongoDatabase implements Database {
     }
 
     addCategory(newCategory: BaseCategory,): Promise<Category> {
-        throw new Error('Method not implemented.');
+        console.log(`New Category is ${newCategory}`);
+        let categoryAddPromise = CategoryModel.create({
+            user: newCategory.user_id,
+            category_name: newCategory.category_name,
+            amount: newCategory.amount,
+            monthly_default: newCategory.monthly_default,
+        });
+        return categoryAddPromise.then(
+            (res: any) => {
+                console.log(`Created ${res} category document.`);
+                return {
+                    category_id: res._id,
+                    category_name: res.category_name,
+                    amount: res.amount,
+                    monthly_default: res.monthly_default,
+                    user_id: res.user_id,
+                };
+            }
+        );
     }
 
     editCategory(category: Category): Promise<Category> {
@@ -269,9 +292,27 @@ export class MongoDatabase implements Database {
     }
 
     addExpense(newExpense: BaseExpense): Promise<Expense> {
-        throw new Error('Method not implemented.');
+        console.log(`New Expense is ${newExpense}`);
+        let expenseAddPromise = ExpenseModel.create({
+            expense_date: newExpense.expense_date,
+            amount: newExpense.amount,
+            summary: newExpense.summary,
+        });
+        return expenseAddPromise.then(
+            (res: any) => {
+                console.log(`Created ${res} expense document.`);
+                return {
+                    expense_id: res.expense_id,
+                    category_id: res.category_id,
+                    expense_date: res.expense_date,
+                    amount: res.amount,
+                    summary: res.summary,
+                };
+            }
+        );
     }
 
+    // TODO work with Josh on edits
     editExpense(expense: Expense): Promise<Expense> {
         throw new Error('Method not implemented.');
     }
@@ -286,10 +327,12 @@ export class MongoDatabase implements Database {
         );
     }
 
+    // TODO get code from Josh
     addIncome(newIncome: BaseIncome): Promise<Income> {
         throw new Error('Method not implemented.');
     }
 
+    // TODO work with Josh on edits
     editIncome(income: Income): Promise<Income> {
         throw new Error('Method not implemented.');
     }

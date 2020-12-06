@@ -56,35 +56,35 @@ async function setup() {
 
 
     // example of creating an income with a user (could also use the user's id instead of object directly)
-    await IncomeModel.create({
-        income_date: Date(),
-        amount: 20,
-        summary: 'my summary1',
-        user: user,
-    });
-
-    await IncomeModel.create({
-        income_date: Date(),
-        amount: 20,
-        summary: 'my summary2',
-        user: user,
-    });
+    // await IncomeModel.create({
+    //     income_date: Date(),
+    //     amount: 20,
+    //     summary: 'my summary1',
+    //     user: user,
+    // });
+    //
+    // await IncomeModel.create({
+    //     income_date: Date(),
+    //     amount: 20,
+    //     summary: 'my summary2',
+    //     user: user,
+    // });
 
     // example of creating a category with a user
-    const category = await CategoryModel.create( {
-        category_name: 'myCategory',
-        amount: 120,
-        monthly_default: 200,
-        user: user,
-    });
+    // const category = await CategoryModel.create( {
+    //     category_name: 'myCategory',
+    //     amount: 120,
+    //     monthly_default: 200,
+    //     user: user,
+    // });
 
     // example of creating an expense with a category
-    await ExpenseModel.create( {
-        expense_date: Date(),
-        amount: 5,
-        summary: String,
-        category: category,
-    });
+    // await ExpenseModel.create( {
+    //     expense_date: Date(),
+    //     amount: 5,
+    //     summary: "testSummary",
+    //     category: category,
+    // });
 
     // example of finding an income by user (could also use user's object id)
     const income = await IncomeModel.findOne({user: user});
