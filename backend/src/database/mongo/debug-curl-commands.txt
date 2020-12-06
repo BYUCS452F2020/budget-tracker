@@ -45,7 +45,8 @@ curl -XPOST -H "Content-type: application/json" -d '{"user_id": "5fcc355ba63ecb5
 // Edits
 // *****
 
-// TODO
+// editUser
+curl -XPUT -H "Content-type: application/json" -d '{"user_id": "5fcc445f07289a389cc1989c", "email": "testEdit@gmail.com", "first_name": "notNate", "last_name": "notBarlow", "passwd": "bye", "unallocated_funds": 66}' 'http://localhost:3001/users/5fcc445f07289a389cc1989c'
 
 // *******
 // Deletes

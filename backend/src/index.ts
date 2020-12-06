@@ -49,7 +49,7 @@ async function setup() {
     const user = await UserModel.create({
         email: 'nate',
         first_name: 'Nate',
-        last_name: 'NateLast',
+        last_name: 'Barlow',
         passwd: 'hello',
         unallocated_funds: 10,
     });
@@ -63,34 +63,34 @@ async function setup() {
     // });
     //
     // // example of creating a category with a user
-    const category1 = await CategoryModel.create( {
-        category_name: 'myCategory1',
-        amount: 120,
-        monthly_default: 100,
-        user: user,
-    });
-
-    const category2 = await CategoryModel.create( {
-        category_name: 'myCategory2',
-        amount: 220,
-        monthly_default: 200,
-        user: user,
-    });
+    // const category1 = await CategoryModel.create( {
+    //     category_name: 'myCategory1',
+    //     amount: 120,
+    //     monthly_default: 100,
+    //     user: user,
+    // });
+    //
+    // const category2 = await CategoryModel.create( {
+    //     category_name: 'myCategory2',
+    //     amount: 220,
+    //     monthly_default: 200,
+    //     user: user,
+    // });
 
     // example of creating an expense with a category
-    await ExpenseModel.create( {
-        expense_date: Date(),
-        amount: 5,
-        summary: "testSummary1",
-        category: category1,
-    });
+    // await ExpenseModel.create( {
+    //     expense_date: Date(),
+    //     amount: 5,
+    //     summary: "testSummary1",
+    //     category: category1,
+    // });
 
-    await ExpenseModel.create( {
-        expense_date: Date(),
-        amount: 5,
-        summary: "testSummary2",
-        category: category2,
-    });
+    // await ExpenseModel.create( {
+    //     expense_date: Date(),
+    //     amount: 5,
+    //     summary: "testSummary2",
+    //     category: category2,
+    // });
 
 
     // example of finding an income by user (could also use user's object id)
@@ -100,8 +100,8 @@ async function setup() {
     // populate actually adds the user object to the user field instead of just an id
     // make sure to run execPopulate();
 
-    // await income.populate('user').execPopulate(); //fixme
-    // await income2[0].populate('user').execPopulate(); //fixme
+    // await income.populate('user').execPopulate();
+    // await income2[0].populate('user').execPopulate();
 
     console.log('found income', income);
     console.log('found income2', income2);

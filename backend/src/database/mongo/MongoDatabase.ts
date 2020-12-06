@@ -8,6 +8,8 @@ import {Database} from '../database';
 // TODO update allocated funds when creating categories...
 // TODO etc. expense vs categories
 
+// TODO verify that dates are processed correctly from frontend for addExpense and addIncome
+
 // ******************
 // Schemas and models
 // ******************
@@ -231,7 +233,7 @@ export class MongoDatabase implements Database {
 
         return userUpdatePromise.then(
             (res: any) => {
-                console.log(`Updated ${res} user document.`);
+                console.log(`Updated from ${res} user document to something else.`);
                 return {
                     user_id: res._id,
                     email: res.email,
@@ -291,7 +293,6 @@ export class MongoDatabase implements Database {
         );
     }
 
-    // FIXME an expense is supposed to have an expense_date, need Date() representation in request
     addExpense(newExpense: BaseExpense): Promise<Expense> {
         console.log(`New Expense is ${newExpense}`);
         let expenseAddPromise = ExpenseModel.create({
@@ -328,7 +329,6 @@ export class MongoDatabase implements Database {
         );
     }
 
-    // FIXME an income is supposed to have an income_date, need Date() representation in request
     addIncome(newIncome: BaseIncome): Promise<Income> {
         console.log(`New Income is ${newIncome}`);
         let incomeAddPromise = IncomeModel.create({
