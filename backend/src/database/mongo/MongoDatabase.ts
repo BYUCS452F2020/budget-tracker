@@ -134,20 +134,19 @@ export class MongoDatabase implements Database {
         )
     }
 
-    // FIXME need to lookup user from category...
     async getExpenses(userId: string): Promise<Expense[]> {
-        throw new Error('Method not implemented.');
-        // let allUserExpenses : Expense[] = [];
-        //
-        // let balanceCategories = await this.getCategories(userId);
-        //
-        // balanceCategories.forEach(category => {
-        //     let mongoExpenses: any[];
-        //     mongoExpenses = await ExpenseModel.find({user: userId});
-        //     allUserExpenses = allUserExpenses.concat(this.getExpensesFromMongoExpenses(mongoExpenses));
-        // });
-        //
-        // return allUserExpenses;
+        let allUserExpenses: Expense[] = [];
+        let balanceCategories = await this.getCategories(userId);
+
+        balanceCategories.forEach(category => {
+            let balanceExpenses: Expense[];
+            ExpenseModel.find({category: category.category_id}).then((res: any[]) => {
+                balanceExpenses = this.getExpensesFromMongoExpenses(res);
+                allUserExpenses = allUserExpenses.concat(balanceExpenses);
+            });
+        });
+
+        return allUserExpenses;
     }
 
     async getCategoryExpenses(categoryId: string): Promise<Expense[]> {

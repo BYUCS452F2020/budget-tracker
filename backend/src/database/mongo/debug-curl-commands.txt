@@ -15,11 +15,11 @@ curl -XGET 'localhost:3001/users/5fcbe762534f3c53006091af/categories'
 // getCategory
 curl -XGET 'localhost:3001/users/5fcbed63fd9a650600b37102/categories/5fcbed63fd9a650600b37104'
 
-// getExpenses // todo broken...
-curl -XGET 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/expenses'
+// getExpenses
+curl -XGET 'localhost:3001/users/5fcc41408c974d28bc44c11e/expenses'
 
 // getCategoryExpenses
-curl -XGET 'localhost:3001/users/trashId/categories/5fcc27f92d1a710a3c2ab69d/expenses'
+curl -XGET 'localhost:3001/users/trashId/categories/5fcc41408c974d28bc44c120/expenses'
 
 // getIncomes
 curl -XGET 'localhost:3001/users/5fcbf44bdbfbf8138c99a410/incomes'
