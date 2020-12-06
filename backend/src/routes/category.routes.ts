@@ -13,7 +13,7 @@ categoryRouter.post('/', async (req: Request<ParamsDictionary, Category, CreateC
     try {
         const category = await db.addCategory({
             ...req.body,
-            user_id: parseInt(req.params.userId),
+            user_id: req.params.userId,
         });
         res.send(category);
     } catch (error) {

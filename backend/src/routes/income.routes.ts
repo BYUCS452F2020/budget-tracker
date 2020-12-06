@@ -13,7 +13,7 @@ incomeRouter.post('/', async (req: Request<ParamsDictionary, Income, CreateIncom
     try {
         const income = await db.addIncome({
             ...req.body,
-            user_id: parseInt(req.params.userId),
+            user_id: req.params.userId,
         });
         res.send(income);
     } catch (error) {

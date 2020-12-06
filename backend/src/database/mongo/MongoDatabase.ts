@@ -277,6 +277,7 @@ export class MongoDatabase implements Database {
         );
     }
 
+    // TODO updates
     editCategory(category: Category): Promise<Category> {
         throw new Error('Method not implemented.');
     }
@@ -291,6 +292,7 @@ export class MongoDatabase implements Database {
         );
     }
 
+    // FIXME an expense is supposed to have an expense_date, need Date() representation in request
     addExpense(newExpense: BaseExpense): Promise<Expense> {
         console.log(`New Expense is ${newExpense}`);
         let expenseAddPromise = ExpenseModel.create({
@@ -302,7 +304,7 @@ export class MongoDatabase implements Database {
             (res: any) => {
                 console.log(`Created ${res} expense document.`);
                 return {
-                    expense_id: res.expense_id,
+                    expense_id: res._id,
                     category_id: res.category_id,
                     expense_date: res.expense_date,
                     amount: res.amount,
@@ -312,7 +314,7 @@ export class MongoDatabase implements Database {
         );
     }
 
-    // TODO work with Josh on edits
+    // TODO updates
     editExpense(expense: Expense): Promise<Expense> {
         throw new Error('Method not implemented.');
     }
@@ -327,12 +329,30 @@ export class MongoDatabase implements Database {
         );
     }
 
-    // TODO get code from Josh
+    // FIXME an income is supposed to have an income_date, need Date() representation in request
     addIncome(newIncome: BaseIncome): Promise<Income> {
-        throw new Error('Method not implemented.');
+        console.log(`New Income is ${newIncome}`);
+        let incomeAddPromise = IncomeModel.create({
+            user_id: newIncome.user_id,
+            income_date: newIncome.income_date,
+            amount: newIncome.amount,
+            summary: newIncome.summary,
+        });
+        return incomeAddPromise.then(
+            (res: any) => {
+                console.log(`Created ${res} income document.`);
+                return {
+                    income_id: res._id,
+                    user_id: res.user_id,
+                    income_date: res.income_date,
+                    amount: res.amount,
+                    summary: res.summary,
+                };
+            }
+        );
     }
 
-    // TODO work with Josh on edits
+    // TODO updates
     editIncome(income: Income): Promise<Income> {
         throw new Error('Method not implemented.');
     }

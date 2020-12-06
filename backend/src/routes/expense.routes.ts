@@ -13,7 +13,7 @@ expenseRouter.post('/', async (req: Request<ParamsDictionary, Expense, CreateExp
     try {
         const expense = await db.addExpense({
             ...req.body,
-            category_id: parseInt(req.params.categoryId),
+            category_id: req.params.categoryId,
         });
         res.send(expense);
     } catch (error) {
