@@ -278,9 +278,28 @@ export class MongoDatabase implements Database {
         );
     }
 
-    // TODO updates
     editCategory(category: Category): Promise<Category> {
-        throw new Error('Method not implemented.');
+        let categoryUpdatePromise = CategoryModel.findByIdAndUpdate(category.category_id,
+            {
+                user_id: category.user_id,
+                category_id: category.category_id,
+                category_name: category.category_name,
+                amount: category.amount,
+                monthly_default: category.monthly_default,
+            }
+        );
+        return categoryUpdatePromise.then(
+            (res: any) => {
+                console.log(`Updated ${res} category document.`);
+                return {
+                    user_id: res._id,
+                    category_id: res.category_id,
+                    category_name: res.category_name,
+                    amount: res.amount,
+                    monthly_default: res.monthly_default,
+                };
+            }
+        );
     }
 
     deleteCategory(categoryId: string): Promise<void> {
@@ -314,9 +333,28 @@ export class MongoDatabase implements Database {
         );
     }
 
-    // TODO updates
     editExpense(expense: Expense): Promise<Expense> {
-        throw new Error('Method not implemented.');
+        let expenseUpdatePromise = ExpenseModel.findByIdAndUpdate(expense.expense_id,
+            {
+                expense_id: expense.expense_id,
+                category_id: expense.category_id,
+                expense_date: expense.expense_date,
+                amount: expense.amount,
+                summary: expense.summary,
+            }
+        );
+        return expenseUpdatePromise.then(
+            (res: any) => {
+                console.log(`Updated ${res} expense document.`);
+                return {
+                    expense_id: res._id,
+                    category_id: res.category_id,
+                    expense_date: res.expense_date,
+                    amount: res.amount,
+                    summary: res.summary,
+                };
+            }
+        );
     }
 
     deleteExpense(expenseId: string): Promise<void> {
@@ -351,9 +389,28 @@ export class MongoDatabase implements Database {
         );
     }
 
-    // TODO updates
     editIncome(income: Income): Promise<Income> {
-        throw new Error('Method not implemented.');
+        let incomeUpdatePromise = IncomeModel.findByIdAndUpdate(income.income_id,
+            {
+                income_id: income.income_id,
+                user_id: income.user_id,
+                amount: income.amount,
+                summary: income.summary,
+                income_date: income.income_date,
+            }
+        );
+        return incomeUpdatePromise.then(
+            (res: any) => {
+                console.log(`Updated ${res} income document.`);
+                return {
+                    income_id: res._id,
+                    user_id: res.user_id,
+                    amount: res.amount,
+                    summary: res.summary,
+                    income_date: res.income_date,
+                };
+            }
+        );
     }
 
     deleteIncome(incomeId: string): Promise<void> {

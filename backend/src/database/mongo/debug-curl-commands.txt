@@ -1,5 +1,6 @@
 
-// todo LoginUser
+// loginUser
+// TODO add curl command for loginUser
 
 
 // *****
@@ -47,6 +48,15 @@ curl -XPOST -H "Content-type: application/json" -d '{"user_id": "5fcc355ba63ecb5
 
 // editUser
 curl -XPUT -H "Content-type: application/json" -d '{"user_id": "5fcc445f07289a389cc1989c", "email": "testEdit@gmail.com", "first_name": "notNate", "last_name": "notBarlow", "passwd": "bye", "unallocated_funds": 66}' 'http://localhost:3001/users/5fcc445f07289a389cc1989c'
+
+// editCategory
+curl -XPUT -H "Content-type: application/json" -d '{"category_id": "5fcc51c59757e144c42aa977", "user_id": "newUserId", "category_name": "newRent", "amount": 333, "monthly_default": 300}' 'http://localhost:3001/users/5fcc51c59757e144c42aa976/categories/5fcc51c59757e144c42aa977'
+
+// editExpense
+curl -XPUT -H "Content-type: application/json" -d '{"expense_id": "5fcc53568021653e10070e2d", "category_id": "newCatId", "expense_date": "01/01/2020", "amount": 444, "summary": "expensiveRent"}' 'http://localhost:3001/users/5fcc53568021653e10070e2b/categories/5fcc53568021653e10070e2c/expenses/5fcc53568021653e10070e2d'
+
+// editIncome
+curl -XPUT -H "Content-type: application/json" -d '{"income_id": "5fcc54a24e1046223c568cdf", "user_id": "newUserId", "income_date": "01/01/2020", "amount": 100, "summary": "a gift"}' 'http://localhost:3001/users/5fcc54a24e1046223c568cde/incomes/5fcc54a24e1046223c568cdf'
 
 // *******
 // Deletes

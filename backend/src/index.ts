@@ -55,12 +55,12 @@ async function setup() {
     });
 
     // example of creating an income with a user (could also use the user's id instead of object directly)
-    // await IncomeModel.create({
-    //     income_date: Date(),
-    //     amount: 20,
-    //     summary: 'my summary1',
-    //     user: user,
-    // });
+    await IncomeModel.create({
+        income_date: Date(),
+        amount: 20,
+        summary: 'my summary1',
+        user: user,
+    });
     //
     // // example of creating a category with a user
     // const category1 = await CategoryModel.create( {
