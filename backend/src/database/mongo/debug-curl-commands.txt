@@ -1,7 +1,9 @@
 
 // loginUser
-// TODO add curl command for loginUser
-
+// good
+curl -XPOST -H "Content-type: application/json" -d '{"email": "testLogin@gmail.com", "passwd": "myPassword"}' 'http://localhost:3001/users/login'
+// bad
+curl -XPOST -H "Content-type: application/json" -d '{"email": "testLogin@gmail.com", "passwd": "badPass"}' 'http://localhost:3001/users/login'
 
 // *****
 // Gets

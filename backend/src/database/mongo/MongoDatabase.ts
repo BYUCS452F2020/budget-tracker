@@ -80,8 +80,25 @@ export class MongoDatabase implements Database {
     }
 
     loginUser(email: string, passwd: string): Promise<User> {
-        // TODO this is a post, see pg
-        throw new Error('Method not implemented.');
+        let userGetPromise: any = UserModel.findOne(
+            {
+                email: email,
+                passwd: passwd,
+            }
+        );
+        return userGetPromise.then(
+            (res: any) => {
+                console.log(`Logging in user ${res}.`);
+                return {
+                    user_id: res._id,
+                    email: res.email,
+                    first_name: res.first_name,
+                    last_name: res.last_name,
+                    passwd: res.passwd,
+                    unallocated_funds: res.unallocated_funds,
+                };
+            }
+        )
     }
 
     getUser(userId: string): Promise<User> {
