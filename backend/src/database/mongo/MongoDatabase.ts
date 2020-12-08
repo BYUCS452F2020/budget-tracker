@@ -315,6 +315,7 @@ export class MongoDatabase implements Database {
     addExpense(newExpense: BaseExpense): Promise<Expense> {
         console.log(`New Expense is ${newExpense}`);
         let expenseAddPromise = ExpenseModel.create({
+            category_id: newExpense.category_id,
             expense_date: newExpense.expense_date,
             amount: newExpense.amount,
             summary: newExpense.summary,
