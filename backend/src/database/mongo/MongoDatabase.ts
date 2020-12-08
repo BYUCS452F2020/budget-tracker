@@ -273,8 +273,22 @@ export class MongoDatabase implements Database {
         );
     }
 
-    addCategory(newCategory: BaseCategory,): Promise<Category> {
+    async addCategory(newCategory: BaseCategory,): Promise<Category> {
         console.log(`New Category is ${newCategory}`);
+        let user: any = await UserModel.findById(newCategory.user_id);
+        let newUnallocatedFunds = user.unallocated_funds - newCategory.amount;
+
+        await user.update(
+            {
+                user_id: user.user_id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                passwd: user.passwd,
+                unallocated_funds: newUnallocatedFunds,
+            }
+        );
+
         let categoryAddPromise = CategoryModel.create({
             user: newCategory.user_id,
             category_name: newCategory.category_name,
@@ -295,8 +309,24 @@ export class MongoDatabase implements Database {
         );
     }
 
-    editCategory(category: Category): Promise<Category> {
-        let categoryUpdatePromise = CategoryModel.findByIdAndUpdate(category.category_id,
+    async editCategory(category: Category): Promise<Category> {
+        let categoryToUpdate: any = await CategoryModel.findById(category.category_id);
+        let user: any = await UserModel.findById(category.user_id);
+        let categoryDiffAmount = categoryToUpdate.amount - category.amount;
+        let newUnallocatedFunds = user.unallocated_funds + categoryDiffAmount;
+
+        await user.update(
+            {
+                user_id: user.user_id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                passwd: user.passwd,
+                unallocated_funds: newUnallocatedFunds,
+            }
+        );
+
+        await categoryToUpdate.update(
             {
                 user_id: category.user_id,
                 category_id: category.category_id,
@@ -305,21 +335,18 @@ export class MongoDatabase implements Database {
                 monthly_default: category.monthly_default,
             }
         );
-        return categoryUpdatePromise.then(
-            (res: any) => {
-                console.log(`Updated ${res} category document.`);
-                return {
-                    user_id: res._id,
-                    category_id: res.category_id,
-                    category_name: res.category_name,
-                    amount: res.amount,
-                    monthly_default: res.monthly_default,
-                };
-            }
-        );
+        console.log(`Updated ${categoryToUpdate} category document.`);
+        return {
+            category_id: categoryToUpdate._id,
+            user_id: categoryToUpdate.user_id,
+            category_name: categoryToUpdate.category_name,
+            amount: categoryToUpdate.amount,
+            monthly_default: categoryToUpdate.monthly_default,
+        };
     }
 
     deleteCategory(categoryId: string): Promise<void> {
+        // todo: update unallocated funds
         let categoryDeletePromise = CategoryModel.deleteOne({_id: categoryId});
         return categoryDeletePromise.then(
             (res: any) => {
@@ -329,30 +356,58 @@ export class MongoDatabase implements Database {
         );
     }
 
-    addExpense(newExpense: BaseExpense): Promise<Expense> {
+    async addExpense(newExpense: BaseExpense): Promise<Expense> {
         console.log(`New Expense is ${newExpense}`);
-        let expenseAddPromise = ExpenseModel.create({
+
+        let expense: any = await ExpenseModel.create({
             category_id: newExpense.category_id,
             expense_date: newExpense.expense_date,
             amount: newExpense.amount,
             summary: newExpense.summary,
         });
-        return expenseAddPromise.then(
-            (res: any) => {
-                console.log(`Created ${res} expense document.`);
-                return {
-                    expense_id: res._id,
-                    category_id: res.category_id,
-                    expense_date: res.expense_date,
-                    amount: res.amount,
-                    summary: res.summary,
-                };
+        let category: any = await CategoryModel.findById(newExpense.category_id);
+        let newCatAmount = category.amount - newExpense.amount;
+
+        await category.update(
+            {
+                _id: category._id,
+                user_id: category.user_id,
+                category_id: category.category_id,
+                category_name: category.category_name,
+                amount: newCatAmount,
+                monthly_default: category.monthly_default,
             }
         );
+
+        console.log(`Created ${expense} expense document.`);
+        return {
+            expense_id: expense._id,
+            category_id: expense.category_id,
+            expense_date: expense.expense_date,
+            amount: expense.amount,
+            summary: expense.summary,
+        };
+
     }
 
-    editExpense(expense: Expense): Promise<Expense> {
-        let expenseUpdatePromise = ExpenseModel.findByIdAndUpdate(expense.expense_id,
+    async editExpense(expense: Expense): Promise<Expense> {
+        let expenseToUpdate: any = await ExpenseModel.findById(expense.expense_id);
+        let category: any = await CategoryModel.findById(expense.category_id);
+        let expenseDiffAmount = expenseToUpdate.amount - expense.amount;
+        let newCatAmount = category.amount + expenseDiffAmount;
+
+        await category.update(
+            {
+                _id: category._id,
+                user_id: category.user_id,
+                category_id: category.category_id,
+                category_name: category.category_name,
+                amount: newCatAmount,
+                monthly_default: category.monthly_default,
+            }
+        );
+
+        await expenseToUpdate.update(
             {
                 expense_id: expense.expense_id,
                 category_id: expense.category_id,
@@ -361,31 +416,36 @@ export class MongoDatabase implements Database {
                 summary: expense.summary,
             }
         );
-        return expenseUpdatePromise.then(
-            (res: any) => {
-                console.log(`Updated ${res} expense document.`);
-                return {
-                    expense_id: res._id,
-                    category_id: res.category_id,
-                    expense_date: res.expense_date,
-                    amount: res.amount,
-                    summary: res.summary,
-                };
-            }
-        );
+        console.log(`Updated ${expenseToUpdate} expense document.`);
+        return {
+            expense_id: expenseToUpdate._id,
+            category_id: expenseToUpdate.category_id,
+            expense_date: expenseToUpdate.expense_date,
+            amount: expenseToUpdate.amount,
+            summary: expenseToUpdate.summary,
+        };
     }
 
-    deleteExpense(expenseId: string): Promise<void> {
-        let expenseDeletePromise = ExpenseModel.deleteOne({_id: expenseId});
-        return expenseDeletePromise.then(
-            (res: any) => {
-                console.log(`Deleted an expense.`);
-                return;
+    async deleteExpense(expenseId: string): Promise<void> {
+        let expenseToDelete: any = await ExpenseModel.findById(expenseId);
+        let category: any = await CategoryModel.findById(expenseToDelete.category_id);
+        let newCatAmount = category.amount + expenseToDelete.amount;
+
+        await category.update(
+            {
+                _id: category._id,
+                user_id: category.user_id,
+                category_id: category.category_id,
+                category_name: category.category_name,
+                amount: newCatAmount,
+                monthly_default: category.monthly_default,
             }
         );
+        await expenseToDelete.delete();
+        console.log(`Deleted an expense.`);
     }
 
-    addIncome(newIncome: BaseIncome): Promise<Income> {
+    async addIncome(newIncome: BaseIncome): Promise<Income> {
         console.log(`New Income is ${newIncome}`);
         let incomeAddPromise = IncomeModel.create({
             user_id: newIncome.user_id,
@@ -393,6 +453,21 @@ export class MongoDatabase implements Database {
             amount: newIncome.amount,
             summary: newIncome.summary,
         });
+
+        let user: any = await UserModel.findById(newIncome.user_id);
+        let newUnallocatedFunds = user.unallocated_funds + newIncome.amount;
+
+        await user.update(
+            {
+                user_id: user.user_id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                passwd: user.passwd,
+                unallocated_funds: newUnallocatedFunds,
+            }
+        );
+
         return incomeAddPromise.then(
             (res: any) => {
                 console.log(`Created ${res} income document.`);
@@ -407,8 +482,23 @@ export class MongoDatabase implements Database {
         );
     }
 
-    editIncome(income: Income): Promise<Income> {
-        let incomeUpdatePromise = IncomeModel.findByIdAndUpdate(income.income_id,
+    async editIncome(income: Income): Promise<Income> {
+        let incomeToUpdate: any = await IncomeModel.findById(income.income_id);
+        let user: any = await UserModel.findById(income.user_id);
+        let incomeDiffAmount = incomeToUpdate.amount - income.amount;
+        let newUnallocatedFunds = user.unallocated_funds - incomeDiffAmount;
+
+        await user.update(
+            {
+                user_id: user.user_id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                passwd: user.passwd,
+                unallocated_funds: newUnallocatedFunds,
+            }
+        );
+        await incomeToUpdate.update(
             {
                 income_id: income.income_id,
                 user_id: income.user_id,
@@ -417,27 +507,32 @@ export class MongoDatabase implements Database {
                 income_date: income.income_date,
             }
         );
-        return incomeUpdatePromise.then(
-            (res: any) => {
-                console.log(`Updated ${res} income document.`);
-                return {
-                    income_id: res._id,
-                    user_id: res.user_id,
-                    amount: res.amount,
-                    summary: res.summary,
-                    income_date: res.income_date,
-                };
-            }
-        );
+
+        console.log(`Updated ${incomeToUpdate} income document.`);
+        return {
+            income_id: incomeToUpdate._id,
+            user_id: incomeToUpdate.user_id,
+            amount: incomeToUpdate.amount,
+            summary: incomeToUpdate.summary,
+            income_date: incomeToUpdate.income_date,
+        };
     }
 
-    deleteIncome(incomeId: string): Promise<void> {
-        let incomeDeletePromise = IncomeModel.deleteOne({_id: incomeId});
-        return incomeDeletePromise.then(
-            (res: any) => {
-                console.log(`Deleted an income.`);
-                return;
+    async deleteIncome(incomeId: string): Promise<void> {
+        let income: any = await IncomeModel.findById(incomeId);
+        let user: any = await UserModel.findById(income.user_id);
+        let newUnallocatedFunds = user.unallocated_funds - income.amount;
+        await user.update(
+            {
+                user_id: user.user_id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                passwd: user.passwd,
+                unallocated_funds: newUnallocatedFunds,
             }
         );
+        await income.delete();
+        console.log(`Deleted an income.`);
     }
 }
