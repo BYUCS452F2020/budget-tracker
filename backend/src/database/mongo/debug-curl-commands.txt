@@ -1,0 +1,75 @@
+
+// loginUser
+// TODO add curl command for loginUser
+
+
+// *****
+// Gets
+// *****
+
+// getUser
+curl -XGET 'localhost:3001/users/5fcbf6a7dbfbf8138c99a416'
+
+// getCategories
+curl -XGET 'localhost:3001/users/5fcbe762534f3c53006091af/categories'
+
+// getCategory
+curl -XGET 'localhost:3001/users/5fcbed63fd9a650600b37102/categories/5fcbed63fd9a650600b37104'
+
+// getExpenses
+curl -XGET 'localhost:3001/users/5fcc41408c974d28bc44c11e/expenses'
+
+// getCategoryExpenses
+curl -XGET 'localhost:3001/users/trashId/categories/5fcc41408c974d28bc44c120/expenses'
+
+// getIncomes
+curl -XGET 'localhost:3001/users/5fcbf44bdbfbf8138c99a410/incomes'
+
+
+// ****
+// Adds
+// ****
+
+// AddUser
+curl -XPOST -H "Content-type: application/json" -d '{"email": "testCreate@gmail.com", "first_name": "test", "last_name": "create", "passwd": "badPass", "unallocated_funds": 10}' 'http://localhost:3001/users'
+
+// addCategory
+curl -XPOST -H "Content-type: application/json" -d '{"user_id": "5fcc314178a9a24c40fe431c", "category_name": "rent", "amount": 125, "monthly_default": 200}' 'http://localhost:3001/users/5fcc314178a9a24c40fe431c/categories'
+
+// addExpense
+curl -XPOST -H "Content-type: application/json" -d '{"category_id": "5fcc32f07854d64ac46ce623", "amount": 325, "expense_Date": "11/11/2020", "summary": "Nov rent"}' 'http://localhost:3001/users/5fcc32f07854d64ac46ce622/categories/5fcc32f07854d64ac46ce623/expenses'
+
+// addIncome
+curl -XPOST -H "Content-type: application/json" -d '{"user_id": "5fcc355ba63ecb574c95c9b5", "amount": 2500, "income_Date": "11/11/2020", "summary": "Nov wage"}' 'http://localhost:3001/users/5fcc355ba63ecb574c95c9b5/incomes'
+
+// *****
+// Edits
+// *****
+
+// editUser
+curl -XPUT -H "Content-type: application/json" -d '{"user_id": "5fcc445f07289a389cc1989c", "email": "testEdit@gmail.com", "first_name": "notNate", "last_name": "notBarlow", "passwd": "bye", "unallocated_funds": 66}' 'http://localhost:3001/users/5fcc445f07289a389cc1989c'
+
+// editCategory
+curl -XPUT -H "Content-type: application/json" -d '{"category_id": "5fcc51c59757e144c42aa977", "user_id": "newUserId", "category_name": "newRent", "amount": 333, "monthly_default": 300}' 'http://localhost:3001/users/5fcc51c59757e144c42aa976/categories/5fcc51c59757e144c42aa977'
+
+// editExpense
+curl -XPUT -H "Content-type: application/json" -d '{"expense_id": "5fcc53568021653e10070e2d", "category_id": "newCatId", "expense_date": "01/01/2020", "amount": 444, "summary": "expensiveRent"}' 'http://localhost:3001/users/5fcc53568021653e10070e2b/categories/5fcc53568021653e10070e2c/expenses/5fcc53568021653e10070e2d'
+
+// editIncome
+curl -XPUT -H "Content-type: application/json" -d '{"income_id": "5fcc54a24e1046223c568cdf", "user_id": "newUserId", "income_date": "01/01/2020", "amount": 100, "summary": "a gift"}' 'http://localhost:3001/users/5fcc54a24e1046223c568cde/incomes/5fcc54a24e1046223c568cdf'
+
+// *******
+// Deletes
+// *******
+
+// deleteUser
+curl -XDELETE 'localhost:3001/users/5fcbebc9dc55af1754b92596'
+
+// deleteCategory
+curl -XDELETE 'localhost:3001/users/5fcbe762534f3c53006091af/categories/5fcbe762534f3c53006091b2'
+
+// deleteExpense
+curl -XDELETE 'localhost:3001/users/5fcbeb5b88fdb6295825e8dd/categories/5fcbeb5b88fdb6295825e8df/expenses/5fcbeb5b88fdb6295825e8e0'
+
+// deleteIncome
+curl -XDELETE 'localhost:3001/users/5fcbebc9dc55af1754b92596/incomes/5fcbebc9dc55af1754b92597'

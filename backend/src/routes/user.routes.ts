@@ -10,10 +10,9 @@ import { CreateUserPayload, User } from '../models/user';
 const userRouter = express.Router({ mergeParams: true });
 const db = DatabaseFactory.getDatabase();
 
-// TODO all id's as numbers change to strings
-
 userRouter.post('/', async (req: Request<ParamsDictionary, User, CreateUserPayload>, res) => {
     try {
+        console.log(`reqBody: ${req.body}`);
         const user = await db.addUser(req.body);
         res.send(user);
     } catch (error) {
@@ -42,9 +41,8 @@ userRouter.put('/:userId', async (req: Request<ParamsDictionary, User, User>, re
 });
 
 userRouter.delete('/:userId', async (req: Request<ParamsDictionary>, res) => {
-    const userId = parseInt(req.params.userId);
     try {
-        await db.deleteUser(userId);
+        await db.deleteUser(req.params.userId);
         res.sendStatus(204);
     } catch (error) {
         res.send(error.message).status(500);
@@ -52,9 +50,8 @@ userRouter.delete('/:userId', async (req: Request<ParamsDictionary>, res) => {
 });
 
 userRouter.get('/:userId/expenses', async (req: Request<ParamsDictionary, Expense[]>, res) => {
-    const userId = parseInt(req.params.userId);
     try {
-        const expenses = await db.getExpenses(userId);
+        const expenses = await db.getExpenses(req.params.userId);
         res.send(expenses);
     } catch (error) {
         res.send(error.message).status(500);

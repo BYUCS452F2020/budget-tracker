@@ -13,7 +13,7 @@ categoryRouter.post('/', async (req: Request<ParamsDictionary, Category, CreateC
     try {
         const category = await db.addCategory({
             ...req.body,
-            user_id: parseInt(req.params.userId),
+            user_id: req.params.userId,
         });
         res.send(category);
     } catch (error) {
@@ -22,9 +22,8 @@ categoryRouter.post('/', async (req: Request<ParamsDictionary, Category, CreateC
 });
 
 categoryRouter.get('/', async (req: Request<ParamsDictionary, Category[]>, res) => {
-    const userId = parseInt(req.params.userId);
     try {
-        const categories = await db.getCategories(userId);
+        const categories = await db.getCategories(req.params.userId);
         res.send(categories);
     } catch (error) {
         res.send(error.message).status(500);
@@ -32,9 +31,8 @@ categoryRouter.get('/', async (req: Request<ParamsDictionary, Category[]>, res) 
 });
 
 categoryRouter.get('/:categoryId', async (req: Request<ParamsDictionary, Category>, res) => {
-    const categoryId = parseInt(req.params.categoryId);
     try {
-        const category = await db.getCategory(categoryId);
+        const category = await db.getCategory(req.params.categoryId);
         res.send(category);
     } catch (error) {
         res.send(error.message).status(500);
@@ -53,9 +51,8 @@ categoryRouter.put('/:categoryId', async (req: Request<ParamsDictionary, Categor
 });
 
 categoryRouter.delete('/:categoryId', async (req: Request<ParamsDictionary>, res) => {
-    const categoryId = parseInt(req.params.categoryId);
     try {
-        await db.deleteCategory(categoryId);
+        await db.deleteCategory(req.params.categoryId);
         res.sendStatus(204);
     } catch (error) {
         res.send(error.message).status(500);

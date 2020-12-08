@@ -8,25 +8,25 @@ export interface Database {
 
     loginUser(email: string, passwd: string): Promise<User>;
     getUser(userId: string): Promise<User>;
-    getCategories(userId: number): Promise<Category[]>;
-    getCategory(categoryId: number): Promise<Category>;
-    getExpenses(userId: number): Promise<Expense[]>;
-    getCategoryExpenses(categoryId: number): Promise<Expense[]>;
-    getIncomes(userId: number): Promise<Income[]>;
+    getCategories(userId: string): Promise<Category[]>;
+    getCategory(categoryId: string): Promise<Category>;
+    getExpenses(userId: string): Promise<Expense[]>;
+    getCategoryExpenses(categoryId: string): Promise<Expense[]>;
+    getIncomes(userId: string): Promise<Income[]>;
 
     addUser(newUser: BaseUser): Promise<User>;
     editUser(user: User): Promise<User>;
-    deleteUser(userId: number): Promise<void>;
+    deleteUser(userId: string): Promise<void>;
 
     addCategory(newCategory: BaseCategory): Promise<Category>;
     editCategory(category: Category): Promise<Category>;
-    deleteCategory(categoryId: number): Promise<void>;
+    deleteCategory(categoryId: string): Promise<void>;
 
     addExpense(newExpense: BaseExpense): Promise<Expense>;
     editExpense(expense: Expense): Promise<Expense>;
-    deleteExpense(expenseId: number): Promise<void>;
+    deleteExpense(expenseId: string): Promise<void>;
 
     addIncome(newIncome: BaseIncome): Promise<Income>;
     editIncome(income: Income): Promise<Income>;
-    deleteIncome(incomeId: number): Promise<void>;
+    deleteIncome(incomeId: string): Promise<void>;
 }
