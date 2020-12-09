@@ -34,6 +34,7 @@ incomeRouter.put('/:incomeId', async (req: Request<ParamsDictionary, Income, Inc
     try {
         const income = await db.editIncome({
             ...req.body,
+            user_id: req.params.userId,
         });
         res.send(income);
     } catch (error) {

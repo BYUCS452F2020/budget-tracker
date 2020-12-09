@@ -27,7 +27,9 @@ import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { Action, Dispatch } from 'redux';
 import { BalanceStore } from '../../../../redux/store';
 
-interface StoreProps {}
+interface StoreProps {
+  user: any;
+}
 
 interface DispatchProps {}
 
@@ -42,8 +44,10 @@ interface DashboardNavProps
   selectedComponentName: string;
 }
 
-const mapStateToProps = (_: BalanceStore): StoreProps => {
-  return {};
+const mapStateToProps = ({ user }: BalanceStore): StoreProps => {
+  return {
+    user,
+  };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
@@ -79,6 +83,7 @@ const useStyles = makeStyles<Theme, DisplayProps>((theme) =>
 );
 
 const DashboardNav: React.FC<DashboardNavProps> = ({
+  user,
   selectedComponentName,
   width = 240,
 }) => {
@@ -143,7 +148,7 @@ const DashboardNav: React.FC<DashboardNavProps> = ({
             key={label}
             selected={selectedComponentName === componentName}
             component={RouterLink}
-            to={`/dashboard/${4}/${componentName}`}
+            to={`/dashboard/${user?.user_id ?? 0}/${componentName}`}
           >
             <ListItemIcon>
               {

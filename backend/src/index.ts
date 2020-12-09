@@ -1,13 +1,11 @@
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
-import {DatabaseFactory} from './database/database-factory';
-import {CategoryModel, ExpenseModel, IncomeModel, UserModel} from './database/mongo/MongoDatabase';
-import {categoryRouter} from './routes/category.routes';
-import {expenseRouter} from './routes/expense.routes';
-import {incomeRouter} from './routes/income.routes';
-import {userRouter} from './routes/user.routes';
-import mongoose from "mongoose";
+import { DatabaseFactory } from './database/database-factory';
+import { categoryRouter } from './routes/category.routes';
+import { expenseRouter } from './routes/expense.routes';
+import { incomeRouter } from './routes/income.routes';
+import { userRouter } from './routes/user.routes';
 
 export type ParamsDictionary = { [key: string]: string };
 const port = 3001;
@@ -19,7 +17,7 @@ async function setup() {
     const app = express();
 
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: false}));
+    app.use(bodyParser.urlencoded({ extended: false }));
 
     app.use((req, res, next) => {
         res.header('Access-Control-Allow-Origin', '*');
@@ -46,13 +44,13 @@ async function setup() {
     await DatabaseFactory.getDatabase().init();
 
     // example of creating a user
-    const user = await UserModel.create({
-        email: 'testLogin@gmail.com',
-        first_name: 'Test',
-        last_name: 'Login',
-        passwd: 'myPassword',
-        unallocated_funds: 10,
-    });
+    // const user = await UserModel.create({
+    //     email: 'testLogin@gmail.com',
+    //     first_name: 'Test',
+    //     last_name: 'Login',
+    //     passwd: 'myPassword',
+    //     unallocated_funds: 10,
+    // });
 
     // example of creating an income with a user (could also use the user's id instead of object directly)
     // await IncomeModel.create({
@@ -92,10 +90,9 @@ async function setup() {
     //     category: category2,
     // });
 
-
     // example of finding an income by user (could also use user's object id)
-    const income = await IncomeModel.findOne({user: user});
-    const income2 = await IncomeModel.find({user: user._id});
+    // const income = await IncomeModel.findOne({user: user});
+    // const income2 = await IncomeModel.find({user: user._id});
 
     // populate actually adds the user object to the user field instead of just an id
     // make sure to run execPopulate();
@@ -103,8 +100,8 @@ async function setup() {
     // await income.populate('user').execPopulate();
     // await income2[0].populate('user').execPopulate();
 
-    console.log('found income', income);
-    console.log('found income2', income2);
+    // console.log('found income', income);
+    // console.log('found income2', income2);
 
     return app;
 }

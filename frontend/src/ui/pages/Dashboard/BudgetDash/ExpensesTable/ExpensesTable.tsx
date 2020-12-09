@@ -5,7 +5,11 @@ import moment from 'moment';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Action, AnyAction, Dispatch } from 'redux';
-import { BalanceStore, setExpensesAction } from '../../../../../redux/store';
+import {
+  BalanceStore,
+  setCategoriesAction,
+  setExpensesAction,
+} from '../../../../../redux/store';
 import { tableIcons } from '../../../../../utils/table-icons';
 
 interface StoreProps {
@@ -16,6 +20,7 @@ interface StoreProps {
 
 interface DispatchProps {
   setExpenses(expenses: any[]): AnyAction;
+  setCategories(categories: any[]): AnyAction;
 }
 
 interface DisplayProps {}
@@ -40,6 +45,7 @@ const mapStateToProps = ({
 const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   return {
     setExpenses: (expenses) => dispatch(setExpensesAction(expenses)),
+    setCategories: (c) => dispatch(setCategoriesAction(c)),
   };
 };
 
@@ -59,6 +65,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
   expenses,
   categories,
   setExpenses,
+  setCategories,
 }) => {
   useStyles({});
 
@@ -90,9 +97,15 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
           );
           const newExpense = res.data;
           setExpenses([...expenses, newExpense]);
+
+          axios
+            .get(`http://localhost:3001/users/${user.user_id}/categories`)
+            .then((res) => setCategories(res.data));
         },
         onRowUpdate: async (e) => {
+          console.log('called update', e);
           const { expense_id, category_id, summary, amount, expense_date } = e;
+          const d = new Date(expense_date);
           const res = await axios.put(
             `http://localhost:3001/users/${user.user_id}/categories/${category_id}/expenses/${expense_id}`,
             {
@@ -101,7 +114,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               summary,
               amount,
               expense_date: new Date(
-                expense_date - expense_date.getTimezoneOffset() * 60000
+                d.getTime() - d.getTimezoneOffset() * 60000
               ),
             }
           );
@@ -112,12 +125,18 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
           );
           updatedExpenses[idx] = newExpense;
           setExpenses(updatedExpenses);
+          axios
+            .get(`http://localhost:3001/users/${user.user_id}/categories`)
+            .then((res) => setCategories(res.data));
         },
         onRowDelete: async ({ expense_id, category_id }) => {
           await axios.delete(
             `http://localhost:3001/users/${user.user_id}/categories/${category_id}/expenses/${expense_id}`
           );
           setExpenses(expenses.filter((e) => e.expense_id !== expense_id));
+          axios
+            .get(`http://localhost:3001/users/${user.user_id}/categories`)
+            .then((res) => setCategories(res.data));
         },
       }}
       columns={[
@@ -147,6 +166,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
             return acc;
           }, {}),
           width: '25%',
+          editable: 'onAdd',
         },
         {
           title: 'Description',

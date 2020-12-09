@@ -73,7 +73,7 @@ const BudgetDash: React.FC<BudgetDashProps> = ({ user }) => {
             label={tabValue}
             key={tabValue}
             component={Link}
-            to={`/dashboard/${user?.id ?? 0}/budget/${tabValue}`}
+            to={`/dashboard/${user?.user_id ?? 0}/budget/${tabValue}`}
           />
         ))}
       </Tabs>

@@ -5,7 +5,11 @@ import moment from 'moment';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Action, AnyAction, Dispatch } from 'redux';
-import { BalanceStore, setIncomesAction } from '../../../../../redux/store';
+import {
+  BalanceStore,
+  setIncomesAction,
+  setUserAction,
+} from '../../../../../redux/store';
 import { tableIcons } from '../../../../../utils/table-icons';
 
 interface StoreProps {
@@ -15,6 +19,7 @@ interface StoreProps {
 
 interface DispatchProps {
   setIncomes(incomes: any[]): AnyAction;
+  setUser(u: any): AnyAction;
 }
 
 interface DisplayProps {}
@@ -34,6 +39,7 @@ const mapStateToProps = ({ incomes, user }: BalanceStore): StoreProps => {
 const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   return {
     setIncomes: (incomes) => dispatch(setIncomesAction(incomes)),
+    setUser: (u) => dispatch(setUserAction(u)),
   };
 };
 
@@ -47,6 +53,7 @@ const IncomesTable: React.FC<IncomesTableProps> = ({
   incomes,
   user,
   setIncomes,
+  setUser,
 }) => {
   useStyles({});
   return (
@@ -77,10 +84,16 @@ const IncomesTable: React.FC<IncomesTableProps> = ({
           );
           const newIncome = res.data;
           setIncomes([...incomes, newIncome]);
+          const ures = await axios.get(
+            `http://localhost:3001/users/${
+              user?.user_id ?? localStorage.getItem('user-id')
+            }`
+          );
+          setUser(ures.data);
         },
         onRowUpdate: async (i) => {
           const { summary, amount, income_date, income_id } = i;
-
+          const d = new Date(income_date);
           const res = await axios.put(
             `http://localhost:3001/users/${user.user_id}/incomes/${income_id}`,
             {
@@ -88,7 +101,7 @@ const IncomesTable: React.FC<IncomesTableProps> = ({
               summary,
               amount,
               income_date: new Date(
-                income_date - income_date.getTimezoneOffset() * 60000
+                d.getTime() - d.getTimezoneOffset() * 60000
               ),
             }
           );
@@ -99,6 +112,12 @@ const IncomesTable: React.FC<IncomesTableProps> = ({
           );
           updatedIncomes[idx] = newIncome;
           setIncomes(updatedIncomes);
+          const ures = await axios.get(
+            `http://localhost:3001/users/${
+              user?.user_id ?? localStorage.getItem('user-id')
+            }`
+          );
+          setUser(ures.data);
         },
         onRowDelete: async (i) => {
           const { income_id } = i;
@@ -106,6 +125,12 @@ const IncomesTable: React.FC<IncomesTableProps> = ({
             `http://localhost:3001/users/${user.user_id}/incomes/${income_id}`
           );
           setIncomes(incomes.filter((e) => e.income_id !== income_id));
+          const ures = await axios.get(
+            `http://localhost:3001/users/${
+              user?.user_id ?? localStorage.getItem('user-id')
+            }`
+          );
+          setUser(ures.data);
         },
       }}
       columns={[

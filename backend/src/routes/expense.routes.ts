@@ -34,6 +34,7 @@ expenseRouter.put('/:expenseId', async (req: Request<ParamsDictionary, Expense, 
     try {
         const expense = await db.editExpense({
             ...req.body,
+            category_id: req.params.categoryId,
         });
         res.send(expense);
     } catch (error) {
@@ -41,7 +42,7 @@ expenseRouter.put('/:expenseId', async (req: Request<ParamsDictionary, Expense, 
     }
 });
 
-expenseRouter.delete('/:expenseId', async (req : Request<ParamsDictionary>, res) => {
+expenseRouter.delete('/:expenseId', async (req: Request<ParamsDictionary>, res) => {
     try {
         await db.deleteExpense(req.params.expenseId);
         res.sendStatus(204);

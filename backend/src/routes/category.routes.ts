@@ -43,6 +43,7 @@ categoryRouter.put('/:categoryId', async (req: Request<ParamsDictionary, Categor
     try {
         const category = await db.editCategory({
             ...req.body,
+            user_id: req.params.userId,
         });
         res.send(category);
     } catch (error) {

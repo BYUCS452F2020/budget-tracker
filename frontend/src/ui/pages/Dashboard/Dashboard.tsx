@@ -4,6 +4,7 @@ import {
   createStyles,
   makeStyles,
   Theme,
+  Typography,
 } from '@material-ui/core';
 import axios from 'axios';
 import React from 'react';
@@ -78,6 +79,12 @@ const useStyles = makeStyles<Theme, DisplayProps>((theme) =>
       flexGrow: 1,
       padding: theme.spacing(3),
     },
+    positive: {
+      color: theme.palette.success.main,
+    },
+    negative: {
+      color: theme.palette.error.main,
+    },
   })
 );
 
@@ -111,16 +118,28 @@ const Dashboard: React.FC<DashboardProps> = ({
     axios
       .get(`http://localhost:3001/users/${user.user_id}/incomes`)
       .then((res) => setIncomes(res.data));
+
     axios
       .get(`http://localhost:3001/users/${user.user_id}/categories`)
       .then((res) => setCategories(res.data));
   }
 
+  const funds = user?.unallocated_funds ?? 0;
   return (
     <Box display="flex" className={classes.root} minHeight="100vh">
       <DashboardNav selectedComponentName={componentName} />
       <Box className={classes.content}>
         <Container className={classes.componentContainer}>
+          <Typography variant="h4">
+            Money to budget:{' '}
+            <span
+              className={
+                funds > 0 ? classes.positive : funds < 0 ? classes.negative : ''
+              }
+            >
+              ${funds}
+            </span>
+          </Typography>
           {component}
         </Container>
       </Box>

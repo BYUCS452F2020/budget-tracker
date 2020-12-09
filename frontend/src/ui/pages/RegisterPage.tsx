@@ -13,11 +13,16 @@ import {
   Typography,
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
-import React, { useState } from 'react';
+import axios, { AxiosError } from 'axios';
+import React, { useCallback, useState } from 'react';
 import { connect } from 'react-redux';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { Action, AnyAction, Dispatch } from 'redux';
-import { setUserAction } from '../../redux/store';
+import {
+  setSnackbarAction,
+  setUserAction,
+  SnackbarInfo,
+} from '../../redux/store';
 import { useBoolean } from '../../utils/hooks/useBoolean';
 import { useInput } from '../../utils/hooks/useInput';
 
@@ -26,6 +31,7 @@ interface DisplayProps {}
 interface StoreProps {}
 
 interface DispatchProps {
+  setSnackbar(s: Partial<SnackbarInfo>): AnyAction;
   setUser(user: any): AnyAction;
 }
 
@@ -38,6 +44,7 @@ const mapStateToProps = (): StoreProps => {
 const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   return {
     setUser: (user) => dispatch(setUserAction(user)),
+    setSnackbar: (s) => dispatch(setSnackbarAction(s)),
   };
 };
 
@@ -56,7 +63,12 @@ const useStyles = makeStyles<Theme, DisplayProps>((theme) =>
   })
 );
 
-const RegisterPage: React.FC<RegisterPageProps> = ({ setUser }) => {
+const RegisterPage: React.FC<RegisterPageProps> = ({
+  setUser,
+  setSnackbar,
+}) => {
+  const history = useHistory();
+
   const [first, firstActions] = useInput();
   const [last, lastActions] = useInput();
   const [email, emailActions] = useInput();
@@ -94,6 +106,39 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ setUser }) => {
     newFieldBlurred[field] = true;
     setWasBlurredByField(newFieldBlurred);
   };
+
+  const onClickRegister = useCallback(async () => {
+    try {
+      const res = await axios.post('http://localhost:3001/users', {
+        email: email,
+        passwd: password1,
+        first_name: first,
+        last_name: last,
+        unallocated_funds: 0,
+      });
+      const user = res.data;
+      setSnackbar({
+        open: true,
+        message: 'Registration Successful',
+        color: 'success',
+      });
+      setUser(user);
+      localStorage.setItem('user-id', user.user_id);
+      user &&
+        history.replace(
+          localStorage.getItem('login-redirect') ?? `/dashboard/${user.user_id}`
+        );
+    } catch (e) {
+      const error: AxiosError = e;
+      const message =
+        error.response?.data?.message ?? 'Something went wrong, try again';
+      setSnackbar({
+        message,
+        open: true,
+        color: 'error',
+      });
+    }
+  }, [email, password1, first, last, history]);
 
   const classes = useStyles({});
   return (
@@ -235,6 +280,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ setUser }) => {
           </Grid>
           <Grid item xs={12}>
             <Button
+              onClick={onClickRegister}
               fullWidth
               color="primary"
               size="large"
